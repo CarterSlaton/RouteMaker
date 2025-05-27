@@ -10,33 +10,31 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@chakra-ui/icons": "^2.2.4",
+    "@chakra-ui/icon": "^3.2.0",
+    "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
-    "@chakra-ui/theme": "^3.4.6",
-    "@chakra-ui/theme-tools": "^2.2.6",
-    "@emotion/react": "^11.11.4",
+    "@chakra-ui/theme": "^3.3.1",
+    "@chakra-ui/theme-tools": "^2.1.2",
+    "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
-    "@mapbox/mapbox-gl-draw": "^1.5.0",
-    "@types/mapbox-gl": "^3.4.1",
-    "framer-motion": "^11.0.8",
-    "mapbox-gl": "^3.12.0",
+    "@mapbox/mapbox-gl-draw": "^1.4.3",
+    "@types/mapbox-gl": "^2.7.19",
+    "framer-motion": "^10.18.0",
+    "mapbox-gl": "^2.15.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-icons": "^5.5.0",
-    "react-router-dom": "^7.6.1"
+    "react-icons": "^4.12.0",
+    "react-router-dom": "^6.21.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.25.0",
-    "@types/mapbox__mapbox-gl-draw": "^1.4.8",
-    "@types/react": "^19.1.2",
-    "@types/react-dom": "^19.1.2",
-    "@vitejs/plugin-react": "^4.4.1",
-    "eslint": "^9.25.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
-    "globals": "^16.0.0",
-    "typescript": "~5.8.3",
-    "typescript-eslint": "^8.30.1",
-    "vite": "^6.3.5"
+    "@types/mapbox__mapbox-gl-draw": "^1.4.3",
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.8"
   }
 }
