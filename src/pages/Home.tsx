@@ -10,9 +10,16 @@ import {
   Icon,
   Flex,
   keyframes,
+  HStack,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { FaRoute, FaMapMarkedAlt, FaRunning } from "react-icons/fa";
+import {
+  FaRoute,
+  FaMapMarkedAlt,
+  FaRunning,
+  FaChevronRight,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
 import { RunnerIcon } from "../components/RunnerIcon";
 
 const bounceAnimation = keyframes`
@@ -22,93 +29,130 @@ const bounceAnimation = keyframes`
 
 const Home = () => {
   const navigate = useNavigate();
-  const cardBg = useColorModeValue("white", "gray.700");
-  const textColor = useColorModeValue("gray.600", "gray.200");
-  const gradientStart = useColorModeValue("teal.500", "teal.200");
-  const gradientEnd = useColorModeValue("brand.500", "brand.200");
+  const cardBg = useColorModeValue("white", "gray.800");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
+  const gradientBg = useColorModeValue(
+    "linear(to-r, teal.500, blue.500)",
+    "linear(to-r, teal.200, blue.200)"
+  );
+  const textColor = useColorModeValue("gray.600", "gray.300");
 
   return (
     <Box
-      w="100%"
-      minH="calc(100vh - 80px)"
-      bgGradient={`linear(to-br, ${gradientStart}10, ${gradientEnd}20)`}
-      py={10}
+      bg={useColorModeValue("gray.50", "gray.900")}
+      minH="calc(100vh - 60px)"
+      display="flex"
+      flexDirection="column"
+      py={12}
     >
-      <Container maxW="container.xl" h="100%">
-        <VStack spacing={12} align="center" mb={16}>
+      <Container maxW="container.xl" px={{ base: 4, md: 8 }}>
+        <VStack spacing={16} align="center">
+          {/* Hero Section */}
           <Box position="relative" w="full" textAlign="center">
-            <Heading
-              size="2xl"
-              bgGradient={`linear(to-r, ${gradientStart}, ${gradientEnd})`}
-              bgClip="text"
-              fontSize={{ base: "4xl", md: "5xl", lg: "6xl" }}
-              mb={4}
-            >
-              Welcome to RouteMaker
-            </Heading>
-            <Icon
-              as={RunnerIcon}
-              w={20}
-              h={20}
-              color={gradientStart}
-              position="absolute"
-              top="-30px"
-              right={{ base: "10%", md: "20%" }}
-              animation={`${bounceAnimation} 3s ease-in-out infinite`}
-            />
+            <VStack spacing={8}>
+              <Box position="relative">
+                <Heading
+                  size="2xl"
+                  bgGradient={gradientBg}
+                  bgClip="text"
+                  fontSize={{ base: "4xl", md: "5xl", lg: "6xl" }}
+                  mb={4}
+                >
+                  Welcome to RouteMaker
+                </Heading>
+                <Icon
+                  as={RunnerIcon}
+                  w={20}
+                  h={20}
+                  color="teal.500"
+                  position="absolute"
+                  top="-30px"
+                  right={{ base: "10%", md: "20%" }}
+                  animation={`${bounceAnimation} 3s ease-in-out infinite`}
+                />
+              </Box>
+
+              <Text
+                fontSize={{ base: "lg", md: "xl" }}
+                color={textColor}
+                maxW={{ base: "100%", md: "80%", lg: "60%" }}
+                textAlign="center"
+              >
+                Create, save, and share your perfect running routes with our
+                interactive map tool. Plan your next adventure with confidence!
+              </Text>
+
+              <HStack spacing={4}>
+                <Button
+                  size="lg"
+                  colorScheme="teal"
+                  onClick={() => navigate("/create")}
+                  rightIcon={<Icon as={FaChevronRight} />}
+                  px={8}
+                  py={6}
+                  fontSize="xl"
+                  _hover={{
+                    transform: "translateY(-4px)",
+                    boxShadow: "xl",
+                  }}
+                  transition="all 0.3s"
+                >
+                  Start Creating Routes
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  colorScheme="teal"
+                  onClick={() => navigate("/routes")}
+                  rightIcon={<Icon as={FaMapMarkerAlt} />}
+                  px={8}
+                  py={6}
+                  fontSize="xl"
+                  _hover={{
+                    transform: "translateY(-4px)",
+                    boxShadow: "xl",
+                    bg: "teal.50",
+                  }}
+                  transition="all 0.3s"
+                >
+                  View Routes
+                </Button>
+              </HStack>
+            </VStack>
           </Box>
 
-          <Text
-            fontSize={{ base: "lg", md: "xl" }}
-            color={textColor}
-            maxW={{ base: "100%", md: "80%", lg: "60%" }}
-            textAlign="center"
+          {/* Features Section */}
+          <SimpleGrid
+            columns={{ base: 1, md: 2, lg: 3 }}
+            spacing={{ base: 8, lg: 12 }}
+            w="full"
           >
-            Create, save, and share your perfect running routes with our
-            interactive map tool. Plan your next adventure with confidence!
-          </Text>
-
-          <Button
-            size="lg"
-            colorScheme="teal"
-            onClick={() => navigate("/create")}
-            px={8}
-            py={6}
-            fontSize="xl"
-            _hover={{
-              transform: "translateY(-4px)",
-              boxShadow: "xl",
-            }}
-            transition="all 0.3s"
-          >
-            Start Creating Routes
-          </Button>
+            <Feature
+              icon={FaRoute}
+              title="Smart Route Creation"
+              description="Design your perfect running route with our intelligent map interface. Get real-time distance calculations and elevation profiles."
+              gradient={gradientBg}
+              cardBg={cardBg}
+              borderColor={borderColor}
+            />
+            <Feature
+              icon={FaMapMarkedAlt}
+              title="Interactive Maps"
+              description="Explore detailed street views and satellite imagery. Find the best paths and trails in your area."
+              gradient={gradientBg}
+              cardBg={cardBg}
+              borderColor={borderColor}
+            />
+            <Feature
+              icon={FaRunning}
+              title="Runner Focused"
+              description="Built for runners by runners. Track your progress, save favorite routes, and share with the community."
+              gradient={gradientBg}
+              cardBg={cardBg}
+              borderColor={borderColor}
+            />
+          </SimpleGrid>
         </VStack>
-
-        <SimpleGrid
-          columns={{ base: 1, md: 2, lg: 3 }}
-          spacing={{ base: 8, lg: 12 }}
-          mt={20}
-        >
-          <Feature
-            icon={FaRoute}
-            title="Smart Route Creation"
-            description="Design your perfect running route with our intelligent map interface. Get real-time distance calculations and elevation profiles."
-            gradient={`linear(to-br, ${gradientStart}, ${gradientEnd})`}
-          />
-          <Feature
-            icon={FaMapMarkedAlt}
-            title="Interactive Maps"
-            description="Explore detailed street views and satellite imagery. Find the best paths and trails in your area."
-            gradient={`linear(to-br, ${gradientEnd}, ${gradientStart})`}
-          />
-          <Feature
-            icon={FaRunning}
-            title="Runner Focused"
-            description="Built for runners by runners. Track your progress, save favorite routes, and share with the community."
-            gradient={`linear(to-br, ${gradientStart}, ${gradientEnd})`}
-          />
-        </SimpleGrid>
       </Container>
     </Box>
   );
@@ -119,20 +163,23 @@ const Feature = ({
   title,
   description,
   gradient,
+  cardBg,
+  borderColor,
 }: {
   icon: any;
   title: string;
   description: string;
   gradient: string;
+  cardBg: string;
+  borderColor: string;
 }) => {
-  const cardBg = useColorModeValue("white", "gray.700");
-  const iconBg = useColorModeValue("teal.500", "teal.200");
-
   return (
     <Box
       p={8}
       bg={cardBg}
-      borderRadius="xl"
+      borderRadius="2xl"
+      border="1px"
+      borderColor={borderColor}
       boxShadow="xl"
       position="relative"
       overflow="hidden"
@@ -155,16 +202,16 @@ const Feature = ({
       <Flex
         w={12}
         h={12}
-        bg={iconBg}
+        bgGradient={gradient}
         color="white"
-        borderRadius="lg"
+        borderRadius="xl"
         align="center"
         justify="center"
         mb={4}
       >
         <Icon as={icon} w={6} h={6} />
       </Flex>
-      <Heading size="md" mb={4} color={useColorModeValue("gray.800", "white")}>
+      <Heading size="md" mb={4} bgGradient={gradient} bgClip="text">
         {title}
       </Heading>
       <Text color={useColorModeValue("gray.600", "gray.300")}>
