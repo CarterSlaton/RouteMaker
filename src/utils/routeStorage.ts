@@ -14,10 +14,21 @@ export interface Route {
 
 const API_URL = "http://localhost:5000/api/routes";
 
+// Helper function to get auth headers
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` })
+  };
+};
+
 // Get all routes from API
 export const getRoutes = async (): Promise<Route[]> => {
   try {
-    const response = await fetch(API_URL);
+    const response = await fetch(API_URL, {
+      headers: getAuthHeaders()
+    });
     if (!response.ok) throw new Error("Failed to fetch routes");
     const routes = await response.json();
     // Transform MongoDB data to match frontend interface
@@ -42,9 +53,7 @@ export const saveRoute = async (route: Omit<Route, "id" | "createdAt">): Promise
   try {
     const response = await fetch(API_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         name: route.name,
         distance: route.distance,
@@ -77,6 +86,7 @@ export const deleteRoute = async (id: string): Promise<boolean> => {
   try {
     const response = await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
+      headers: getAuthHeaders(),
     });
     return response.ok;
   } catch (error) {
@@ -90,9 +100,7 @@ export const updateRoute = async (id: string, updates: Partial<Route>): Promise<
   try {
     const response = await fetch(`${API_URL}/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(updates),
     });
 
@@ -118,7 +126,9 @@ export const updateRoute = async (id: string, updates: Partial<Route>): Promise<
 // Get a single route by ID
 export const getRoute = async (id: string): Promise<Route | null> => {
   try {
-    const response = await fetch(`${API_URL}/${id}`);
+    const response = await fetch(`${API_URL}/${id}`, {
+      headers: getAuthHeaders()
+    });
     if (!response.ok) return null;
     const route = await response.json();
     
@@ -141,7 +151,9 @@ export const getRoute = async (id: string): Promise<Route | null> => {
 // Get route statistics
 export const getRouteStats = async () => {
   try {
-    const response = await fetch(`${API_URL}/stats/summary`);
+    const response = await fetch(`${API_URL}/stats/summary`, {
+      headers: getAuthHeaders()
+    });
     if (!response.ok) throw new Error("Failed to fetch stats");
     return await response.json();
   } catch (error) {

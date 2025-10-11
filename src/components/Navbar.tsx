@@ -7,11 +7,46 @@ import {
   useDisclosure,
   Stack,
   useColorModeValue,
+  Button,
+  Text,
+  Avatar,
 } from "@chakra-ui/react";
 import type { SystemStyleObject } from "@chakra-ui/react";
-import { Link as RouterLink, useLocation } from "react-router-dom";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { RunnerIcon } from "./RunnerIcon";
+import { useAuth } from "../contexts/AuthContext";
+
+const UserSection = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  if (!user) return null;
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  return (
+    <Flex align="center" gap={3}>
+      <Flex align="center" gap={2}>
+        <Avatar size="sm" name={user.name} bg="teal.500" />
+        <Text display={{ base: "none", md: "block" }} fontWeight="medium">
+          {user.name}
+        </Text>
+      </Flex>
+      <Button
+        onClick={handleLogout}
+        colorScheme="teal"
+        variant="outline"
+        size="sm"
+      >
+        Logout
+      </Button>
+    </Flex>
+  );
+};
 
 const Navbar = () => {
   const { isOpen, onToggle } = useDisclosure();
@@ -96,10 +131,12 @@ const Navbar = () => {
           _hover={{ bg: "teal.50" }}
         />
 
-        <Box
-          display={{ base: isOpen ? "block" : "none", md: "block" }}
+        <Flex
+          display={{ base: isOpen ? "flex" : "none", md: "flex" }}
           flexBasis={{ base: "100%", md: "auto" }}
           mt={{ base: 4, md: 0 }}
+          alignItems="center"
+          gap={6}
         >
           <Stack
             spacing={8}
@@ -121,7 +158,8 @@ const Navbar = () => {
               </Box>
             ))}
           </Stack>
-        </Box>
+          <UserSection />
+        </Flex>
       </Flex>
     </Box>
   );
