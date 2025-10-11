@@ -104,7 +104,10 @@ const Register = () => {
     return "";
   };
 
-  const validateConfirmPassword = (confirmPassword: string, password: string) => {
+  const validateConfirmPassword = (
+    confirmPassword: string,
+    password: string
+  ) => {
     if (!confirmPassword) {
       return "Please confirm your password";
     }
@@ -124,7 +127,10 @@ const Register = () => {
     const nameError = validateName(name);
     const emailError = validateEmail(email);
     const passwordError = validatePassword(password);
-    const confirmPasswordError = validateConfirmPassword(confirmPassword, password);
+    const confirmPasswordError = validateConfirmPassword(
+      confirmPassword,
+      password
+    );
 
     // Update errors and touched state
     setErrors({
@@ -202,15 +208,23 @@ const Register = () => {
       setErrors({ ...errors, password: validatePassword(value) });
     }
     if (touched.confirmPassword) {
-      setErrors({ ...errors, confirmPassword: validateConfirmPassword(confirmPassword, value) });
+      setErrors({
+        ...errors,
+        confirmPassword: validateConfirmPassword(confirmPassword, value),
+      });
     }
   };
 
-  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleConfirmPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const value = e.target.value;
     setConfirmPassword(value);
     if (touched.confirmPassword) {
-      setErrors({ ...errors, confirmPassword: validateConfirmPassword(value, password) });
+      setErrors({
+        ...errors,
+        confirmPassword: validateConfirmPassword(value, password),
+      });
     }
   };
 
@@ -223,7 +237,10 @@ const Register = () => {
     } else if (field === "password") {
       setErrors({ ...errors, password: validatePassword(password) });
     } else if (field === "confirmPassword") {
-      setErrors({ ...errors, confirmPassword: validateConfirmPassword(confirmPassword, password) });
+      setErrors({
+        ...errors,
+        confirmPassword: validateConfirmPassword(confirmPassword, password),
+      });
     }
   };
 
@@ -270,11 +287,16 @@ const Register = () => {
                   <FormErrorMessage>{errors.name}</FormErrorMessage>
                 )}
                 {!errors.name && (
-                  <FormHelperText>Enter your full name (2-50 characters)</FormHelperText>
+                  <FormHelperText>
+                    Enter your full name (2-50 characters)
+                  </FormHelperText>
                 )}
               </FormControl>
 
-              <FormControl isRequired isInvalid={touched.email && !!errors.email}>
+              <FormControl
+                isRequired
+                isInvalid={touched.email && !!errors.email}
+              >
                 <FormLabel>Email</FormLabel>
                 <Input
                   type="email"
@@ -292,7 +314,10 @@ const Register = () => {
                 )}
               </FormControl>
 
-              <FormControl isRequired isInvalid={touched.password && !!errors.password}>
+              <FormControl
+                isRequired
+                isInvalid={touched.password && !!errors.password}
+              >
                 <FormLabel>Password</FormLabel>
                 <InputGroup size="lg">
                   <Input
@@ -304,7 +329,9 @@ const Register = () => {
                   />
                   <InputRightElement>
                     <IconButton
-                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
                       icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
                       onClick={() => setShowPassword(!showPassword)}
                       variant="ghost"
@@ -330,11 +357,16 @@ const Register = () => {
                   </Box>
                 )}
                 {!password && (
-                  <FormHelperText>At least 6 characters required</FormHelperText>
+                  <FormHelperText>
+                    At least 6 characters required
+                  </FormHelperText>
                 )}
               </FormControl>
 
-              <FormControl isRequired isInvalid={touched.confirmPassword && !!errors.confirmPassword}>
+              <FormControl
+                isRequired
+                isInvalid={touched.confirmPassword && !!errors.confirmPassword}
+              >
                 <FormLabel>Confirm Password</FormLabel>
                 <InputGroup size="lg">
                   <Input
@@ -346,9 +378,15 @@ const Register = () => {
                   />
                   <InputRightElement>
                     <IconButton
-                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                      icon={showConfirmPassword ? <ViewOffIcon /> : <ViewIcon />}
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      aria-label={
+                        showConfirmPassword ? "Hide password" : "Show password"
+                      }
+                      icon={
+                        showConfirmPassword ? <ViewOffIcon /> : <ViewIcon />
+                      }
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                       variant="ghost"
                       size="sm"
                       tabIndex={-1}
@@ -359,7 +397,9 @@ const Register = () => {
                   <FormErrorMessage>{errors.confirmPassword}</FormErrorMessage>
                 )}
                 {!errors.confirmPassword && confirmPassword && (
-                  <FormHelperText color="green.500">✓ Passwords match</FormHelperText>
+                  <FormHelperText color="green.500">
+                    ✓ Passwords match
+                  </FormHelperText>
                 )}
               </FormControl>
 

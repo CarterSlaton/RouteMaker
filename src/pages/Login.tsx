@@ -50,7 +50,7 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate form
     const emailValidation = validateEmail(email);
     if (emailValidation) {
@@ -147,7 +147,9 @@ const Login = () => {
                   <FormErrorMessage>{emailError}</FormErrorMessage>
                 )}
                 {!touched.email && (
-                  <FormHelperText>Enter your registered email address</FormHelperText>
+                  <FormHelperText>
+                    Enter your registered email address
+                  </FormHelperText>
                 )}
               </FormControl>
 
@@ -162,7 +164,9 @@ const Login = () => {
                   />
                   <InputRightElement>
                     <IconButton
-                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
                       icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
                       onClick={() => setShowPassword(!showPassword)}
                       variant="ghost"
