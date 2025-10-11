@@ -37,6 +37,7 @@ import {
 } from "react-icons/fa";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { getRoutes, deleteRoute, type Route } from "../utils/routeStorage";
+import RouteCardSkeleton from "../components/RouteCardSkeleton";
 
 // Define animations
 const fadeIn = keyframes`
@@ -55,6 +56,7 @@ const MyRoutes = () => {
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [routes, setRoutes] = useState<Route[]>([]);
+  const [loading, setLoading] = useState(true);
   const [routeToDelete, setRouteToDelete] = useState<string | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -62,6 +64,7 @@ const MyRoutes = () => {
   // Load routes from API on mount
   useEffect(() => {
     const loadRoutes = async () => {
+      setLoading(true);
       const loadedRoutes = await getRoutes();
       // Sort by date (newest first)
       loadedRoutes.sort((a: any, b: any) => {
@@ -70,6 +73,7 @@ const MyRoutes = () => {
         return dateB - dateA;
       });
       setRoutes(loadedRoutes);
+      setLoading(false);
     };
     loadRoutes();
   }, []);
@@ -411,6 +415,15 @@ const MyRoutes = () => {
               Clear Search
             </Button>
           </Box>
+        ) : loading ? (
+          <SimpleGrid
+            columns={{ base: 1, md: 2, lg: 3 }}
+            spacing={{ base: 6, md: 8 }}
+          >
+            {[...Array(6)].map((_, index) => (
+              <RouteCardSkeleton key={index} />
+            ))}
+          </SimpleGrid>
         ) : (
           <SimpleGrid
             columns={{ base: 1, md: 2, lg: 3 }}
@@ -462,6 +475,7 @@ const MyRoutes = () => {
                     width="100%"
                     height="200px"
                     objectFit="cover"
+                    loading="lazy"
                     fallbackSrc="https://via.placeholder.com/300x200?text=Map+Preview"
                   />
                   <Badge

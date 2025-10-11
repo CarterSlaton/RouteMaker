@@ -33,17 +33,13 @@ import {
   FaRuler,
   FaTachometerAlt,
 } from "react-icons/fa";
-import mapboxgl from "mapbox-gl";
 import { getRoutes, deleteRoute, type Route } from "../utils/routeStorage";
-
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || "";
+import RouteMap from "../components/RouteMap";
 
 const RouteDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const toast = useToast();
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
   const [route, setRoute] = useState<Route | null>(null);
   const [loading, setLoading] = useState(true);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -93,97 +89,6 @@ const RouteDetails = () => {
 
     loadRoute();
   }, [id, navigate, toast]);
-
-  // Initialize map
-  useEffect(() => {
-    if (!route || !mapContainer.current || map.current) return;
-
-    // Check if Mapbox token is available
-    if (!mapboxgl.accessToken) {
-      toast({
-        title: "Configuration Error",
-        description:
-          "Mapbox access token is missing. Please check your .env file.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    try {
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: "mapbox://styles/mapbox/streets-v12",
-        center: route.coordinates[0] as [number, number],
-        zoom: 13,
-      });
-    } catch (error) {
-      console.error("Map initialization error:", error);
-      toast({
-        title: "Map Error",
-        description: "Failed to initialize map. Please refresh the page.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    map.current.on("load", () => {
-      if (!map.current || !route) return;
-
-      // Add the route line
-      map.current.addSource("route", {
-        type: "geojson",
-        data: {
-          type: "Feature",
-          properties: {},
-          geometry: {
-            type: "LineString",
-            coordinates: route.coordinates,
-          },
-        },
-      });
-
-      map.current.addLayer({
-        id: "route",
-        type: "line",
-        source: "route",
-        layout: {
-          "line-join": "round",
-          "line-cap": "round",
-        },
-        paint: {
-          "line-color": "#0080ff",
-          "line-width": 4,
-        },
-      });
-
-      // Add start marker
-      new mapboxgl.Marker({ color: "#00ff00" })
-        .setLngLat(route.coordinates[0] as [number, number])
-        .addTo(map.current);
-
-      // Add end marker
-      const lastCoord = route.coordinates[route.coordinates.length - 1];
-      new mapboxgl.Marker({ color: "#ff0000" })
-        .setLngLat(lastCoord as [number, number])
-        .addTo(map.current);
-
-      // Fit map to route bounds
-      const bounds = new mapboxgl.LngLatBounds();
-      route.coordinates.forEach((coord: number[]) => {
-        bounds.extend(coord as [number, number]);
-      });
-      map.current.fitBounds(bounds, { padding: 50 });
-    });
-
-    return () => {
-      map.current?.remove();
-      map.current = null;
-    };
-  }, [route]);
 
   const handleDelete = async () => {
     if (!route || !route._id) return;
@@ -358,14 +263,7 @@ const RouteDetails = () => {
             <VStack spacing={4} align="stretch">
               <Heading size="md">Route Map</Heading>
               <Divider />
-              <Box
-                ref={mapContainer}
-                h="500px"
-                borderRadius="xl"
-                overflow="hidden"
-                border="2px"
-                borderColor={borderColor}
-              />
+              <RouteMap route={route} height="500px" />
               <HStack
                 spacing={4}
                 justify="center"
