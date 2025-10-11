@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import mapboxgl from "mapbox-gl";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
-import { FaMapMarkedAlt, FaRoute, FaSave, FaRuler } from "react-icons/fa";
+import { FaRoute, FaSave, FaRuler } from "react-icons/fa";
 
 // Note: Replace with your Mapbox access token
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
