@@ -4,8 +4,13 @@ import {
   Container,
   FormControl,
   FormLabel,
+  FormErrorMessage,
+  FormHelperText,
   Heading,
   Input,
+  InputGroup,
+  InputRightElement,
+  IconButton,
   Stack,
   Text,
   useColorModeValue,
@@ -14,21 +19,57 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useAuth } from "../contexts/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [touched, setTouched] = useState({ email: false, password: false });
   const { login } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
+
+  // Email validation
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      return "Email is required";
+    }
+    if (!emailRegex.test(email)) {
+      return "Please enter a valid email address";
+    }
+    return "";
+  };
 
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate form
+    const emailValidation = validateEmail(email);
+    if (emailValidation) {
+      setEmailError(emailValidation);
+      setTouched({ ...touched, email: true });
+      return;
+    }
+
+    if (!password) {
+      toast({
+        title: "Password required",
+        description: "Please enter your password",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -52,6 +93,19 @@ const Login = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEmail(value);
+    if (touched.email) {
+      setEmailError(validateEmail(value));
+    }
+  };
+
+  const handleEmailBlur = () => {
+    setTouched({ ...touched, email: true });
+    setEmailError(validateEmail(email));
   };
 
   return (
@@ -79,26 +133,44 @@ const Login = () => {
 
           <form onSubmit={handleSubmit}>
             <Stack spacing={4}>
-              <FormControl isRequired>
+              <FormControl isRequired isInvalid={touched.email && !!emailError}>
                 <FormLabel>Email</FormLabel>
                 <Input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleEmailChange}
+                  onBlur={handleEmailBlur}
                   placeholder="your.email@example.com"
                   size="lg"
                 />
+                {touched.email && emailError && (
+                  <FormErrorMessage>{emailError}</FormErrorMessage>
+                )}
+                {!touched.email && (
+                  <FormHelperText>Enter your registered email address</FormHelperText>
+                )}
               </FormControl>
 
               <FormControl isRequired>
                 <FormLabel>Password</FormLabel>
-                <Input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  size="lg"
-                />
+                <InputGroup size="lg">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                  />
+                  <InputRightElement>
+                    <IconButton
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                      onClick={() => setShowPassword(!showPassword)}
+                      variant="ghost"
+                      size="sm"
+                    />
+                  </InputRightElement>
+                </InputGroup>
+                <FormHelperText>Enter your password</FormHelperText>
               </FormControl>
 
               <Button
