@@ -16,6 +16,14 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
+  IconButton,
+  useDisclosure,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
 } from "@chakra-ui/react";
 import { keyframes } from "@emotion/react";
 import { useNavigate } from "react-router-dom";
@@ -25,8 +33,10 @@ import {
   FaCalendarAlt,
   FaChevronRight,
   FaSearch,
+  FaTrash,
 } from "react-icons/fa";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { getRoutes, deleteRoute, type Route } from "../utils/routeStorage";
 
 // Define animations
 const fadeIn = keyframes`
@@ -44,8 +54,20 @@ const MyRoutes = () => {
     "linear(to-r, teal.200, blue.200)"
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const [routes, setRoutes] = useState<Route[]>([]);
+  const [routeToDelete, setRouteToDelete] = useState<string | null>(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef<HTMLButtonElement>(null);
 
-  // Mock data with coordinates for the route preview
+  // Load routes from localStorage on mount
+  useEffect(() => {
+    const loadedRoutes = getRoutes();
+    // Sort by date (newest first)
+    loadedRoutes.sort((a, b) => b.createdAt - a.createdAt);
+    setRoutes(loadedRoutes);
+  }, []);
+
+  // Mock data with coordinates for the route preview (keeping for backwards compatibility)
   const mockRoutes = [
     {
       id: 1,
@@ -180,17 +202,35 @@ const MyRoutes = () => {
     },
   ];
 
+  // Use real routes if available, otherwise use mock data
+  const displayRoutes = routes.length > 0 ? routes : mockRoutes;
+
   // Filter routes based on search query
   const filteredRoutes = useMemo(() => {
-    if (!searchQuery.trim()) return mockRoutes;
+    if (!searchQuery.trim()) return displayRoutes;
 
     const query = searchQuery.toLowerCase().trim();
-    return mockRoutes.filter(
+    return displayRoutes.filter(
       (route) =>
         route.name.toLowerCase().includes(query) ||
         route.location.toLowerCase().includes(query)
     );
-  }, [searchQuery, mockRoutes]);
+  }, [searchQuery, displayRoutes]);
+
+  const handleDeleteClick = (routeId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    setRouteToDelete(routeId);
+    onOpen();
+  };
+
+  const confirmDelete = () => {
+    if (routeToDelete) {
+      deleteRoute(routeToDelete);
+      setRoutes(routes.filter((r) => r.id !== routeToDelete));
+      setRouteToDelete(null);
+    }
+    onClose();
+  };
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
@@ -303,7 +343,39 @@ const MyRoutes = () => {
       </Box>
 
       <Container maxW="container.xl" flex="1" px={{ base: 4, md: 8 }} pb={8}>
-        {filteredRoutes.length === 0 ? (
+        {displayRoutes.length === 0 ? (
+          <Box
+            textAlign="center"
+            py={10}
+            px={6}
+            bg={cardBg}
+            borderRadius="xl"
+            shadow="xl"
+            animation={`${fadeIn} 0.5s ease-out`}
+          >
+            <Icon as={FaRoute} w={16} h={16} color="teal.500" mb={4} />
+            <Heading size="lg" mb={4}>
+              No Routes Yet
+            </Heading>
+            <Text fontSize="lg" mb={6} color="gray.500">
+              Start creating your first running route!
+            </Text>
+            <Button
+              colorScheme="teal"
+              size="lg"
+              leftIcon={<Icon as={FaRoute} />}
+              rightIcon={<Icon as={FaChevronRight} />}
+              onClick={() => navigate("/create")}
+              _hover={{
+                transform: "translateY(-2px)",
+                shadow: "lg",
+              }}
+              transition="all 0.2s"
+            >
+              Create Your First Route
+            </Button>
+          </Box>
+        ) : filteredRoutes.length === 0 ? (
           <Box
             textAlign="center"
             py={10}
@@ -351,13 +423,26 @@ const MyRoutes = () => {
                 }}
                 transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
                 cursor="pointer"
-                onClick={() =>
-                  console.log("Map URL:", getMapPreviewUrl(route.coordinates))
-                }
                 style={{
                   animationDelay: `${index * 0.1}s`,
                 }}
               >
+                {/* Delete button */}
+                <IconButton
+                  aria-label="Delete route"
+                  icon={<Icon as={FaTrash} />}
+                  position="absolute"
+                  top={4}
+                  left={4}
+                  colorScheme="red"
+                  size="sm"
+                  zIndex={2}
+                  onClick={(e) => handleDeleteClick(String(route.id), e)}
+                  _hover={{
+                    transform: "scale(1.1)",
+                  }}
+                  transition="all 0.2s"
+                />
                 <Box position="relative">
                   <Image
                     src={getMapPreviewUrl(route.coordinates)}
@@ -423,6 +508,36 @@ const MyRoutes = () => {
           </SimpleGrid>
         )}
       </Container>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        isOpen={isOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onClose}
+        isCentered
+      >
+        <AlertDialogOverlay backdropFilter="blur(4px)">
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Delete Route
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure you want to delete this route? This action cannot be
+              undone.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button colorScheme="red" onClick={confirmDelete} ml={3}>
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Box>
   );
 };
