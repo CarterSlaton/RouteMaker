@@ -1,22 +1,23 @@
-import express, { Request, Response } from 'express';
+import express, { Response } from 'express';
 import Route from '../models/Route';
+import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
 
-// Get all routes
-router.get('/', async (req: Request, res: Response) => {
+// Get all routes for the authenticated user
+router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
-    const routes = await Route.find().sort({ createdAt: -1 });
+    const routes = await Route.find({ userId: req.user!.id }).sort({ createdAt: -1 });
     res.json(routes);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching routes', error });
   }
 });
 
-// Get a single route by ID
-router.get('/:id', async (req: Request, res: Response) => {
+// Get a single route by ID (must belong to user)
+router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
-    const route = await Route.findById(req.params.id);
+    const route = await Route.findOne({ _id: req.params.id, userId: req.user!.id });
     if (!route) {
       return res.status(404).json({ message: 'Route not found' });
     }
@@ -27,7 +28,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 });
 
 // Create a new route
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const { name, distance, difficulty, coordinates } = req.body;
     
@@ -38,6 +39,7 @@ router.post('/', async (req: Request, res: Response) => {
     };
 
     const newRoute = new Route({
+      userId: req.user!.id,
       name,
       distance,
       difficulty,
@@ -52,7 +54,7 @@ router.post('/', async (req: Request, res: Response) => {
 });
 
 // Update a route
-router.put('/:id', async (req: Request, res: Response) => {
+router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const { name, distance, difficulty, coordinates } = req.body;
     
@@ -65,8 +67,8 @@ router.put('/:id', async (req: Request, res: Response) => {
       };
     }
 
-    const updatedRoute = await Route.findByIdAndUpdate(
-      req.params.id,
+    const updatedRoute = await Route.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user!.id },
       updateData,
       { new: true, runValidators: true }
     );
@@ -82,9 +84,12 @@ router.put('/:id', async (req: Request, res: Response) => {
 });
 
 // Delete a route
-router.delete('/:id', async (req: Request, res: Response) => {
+router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
-    const deletedRoute = await Route.findByIdAndDelete(req.params.id);
+    const deletedRoute = await Route.findOneAndDelete({ 
+      _id: req.params.id, 
+      userId: req.user!.id 
+    });
     
     if (!deletedRoute) {
       return res.status(404).json({ message: 'Route not found' });
@@ -97,10 +102,10 @@ router.delete('/:id', async (req: Request, res: Response) => {
 });
 
 // Get route statistics
-router.get('/stats/summary', async (req: Request, res: Response) => {
+router.get('/stats/summary', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
-    const totalRoutes = await Route.countDocuments();
-    const routes = await Route.find();
+    const totalRoutes = await Route.countDocuments({ userId: req.user!.id });
+    const routes = await Route.find({ userId: req.user!.id });
     
     const totalDistance = routes.reduce((sum, route) => sum + route.distance, 0);
     const avgDistance = totalRoutes > 0 ? totalDistance / totalRoutes : 0;

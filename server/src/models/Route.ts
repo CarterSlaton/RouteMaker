@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IRoute extends Document {
+  userId: mongoose.Types.ObjectId;
   name: string;
   distance: number;
   difficulty: 'Easy' | 'Moderate' | 'Hard';
@@ -12,6 +13,11 @@ export interface IRoute extends Document {
 }
 
 const RouteSchema: Schema = new Schema({
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   name: {
     type: String,
     required: true,
