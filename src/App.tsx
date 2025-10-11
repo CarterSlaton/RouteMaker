@@ -9,6 +9,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import CreateRoute from "./pages/CreateRoute";
 import MyRoutes from "./pages/MyRoutes";
+import RouteDetails from "./pages/RouteDetails";
 import About from "./pages/About";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -62,6 +63,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <MyRoutes />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/route/:id"
+                  element={
+                    <ProtectedRoute>
+                      <RouteDetails />
                     </ProtectedRoute>
                   }
                 />

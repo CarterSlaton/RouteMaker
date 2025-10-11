@@ -30,8 +30,8 @@ import { FaRoute, FaSave, FaRuler } from "react-icons/fa";
 import { saveRoute } from "../utils/routeStorage";
 import { useNavigate } from "react-router-dom";
 
-// Note: Replace with your Mapbox access token
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+// Initialize Mapbox access token
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || "";
 
 const CreateRoute = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -118,100 +118,125 @@ const CreateRoute = () => {
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/dark-v11",
-      center: [-74.5, 40], // Default center (adjust as needed)
-      zoom: 9,
-    });
+    // Check if Mapbox token is available
+    if (!mapboxgl.accessToken) {
+      toast({
+        title: "Configuration Error",
+        description:
+          "Mapbox access token is missing. Please check your .env file.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
 
-    draw.current = new MapboxDraw({
-      displayControlsDefault: false,
-      controls: {
-        line_string: true,
-        trash: true,
-      },
-      styles: [
-        {
-          id: "gl-draw-line",
-          type: "line",
-          filter: [
-            "all",
-            ["==", "$type", "LineString"],
-            ["!=", "mode", "static"],
-          ],
-          layout: {
-            "line-cap": "round",
-            "line-join": "round",
-          },
-          paint: {
-            "line-color": "#FF3333",
-            "line-width": 4,
-          },
+    try {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: "mapbox://styles/mapbox/dark-v11",
+        center: [-74.5, 40], // Default center (adjust as needed)
+        zoom: 9,
+      });
+
+      draw.current = new MapboxDraw({
+        displayControlsDefault: false,
+        controls: {
+          line_string: true,
+          trash: true,
         },
-        {
-          id: "gl-draw-line-static",
-          type: "line",
-          filter: [
-            "all",
-            ["==", "$type", "LineString"],
-            ["==", "mode", "static"],
-          ],
-          layout: {
-            "line-cap": "round",
-            "line-join": "round",
+        styles: [
+          {
+            id: "gl-draw-line",
+            type: "line",
+            filter: [
+              "all",
+              ["==", "$type", "LineString"],
+              ["!=", "mode", "static"],
+            ],
+            layout: {
+              "line-cap": "round",
+              "line-join": "round",
+            },
+            paint: {
+              "line-color": "#FF3333",
+              "line-width": 4,
+            },
           },
-          paint: {
-            "line-color": "#FF3333",
-            "line-width": 4,
+          {
+            id: "gl-draw-line-static",
+            type: "line",
+            filter: [
+              "all",
+              ["==", "$type", "LineString"],
+              ["==", "mode", "static"],
+            ],
+            layout: {
+              "line-cap": "round",
+              "line-join": "round",
+            },
+            paint: {
+              "line-color": "#FF3333",
+              "line-width": 4,
+            },
           },
-        },
-      ],
-    });
+        ],
+      });
 
-    map.current.addControl(draw.current);
+      map.current.addControl(draw.current);
 
-    map.current.on("draw.create", updateRoute);
-    map.current.on("draw.update", updateRoute);
-    map.current.on("draw.delete", updateRoute);
+      map.current.on("draw.create", updateRoute);
+      map.current.on("draw.update", updateRoute);
+      map.current.on("draw.delete", updateRoute);
 
-    // Get user's location
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { longitude, latitude } = position.coords;
-          setUserLocation([longitude, latitude]);
-          map.current?.flyTo({
-            center: [longitude, latitude],
-            zoom: 13,
-          });
-
-          // Reverse geocode to get location name
-          fetch(
-            `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${mapboxgl.accessToken}`
-          )
-            .then((res) => res.json())
-            .then((data) => {
-              if (data.features && data.features.length > 0) {
-                const place = data.features[0];
-                setLocation(place.place_name || "Unknown Location");
-              }
-            })
-            .catch(() => {
-              setLocation("Unknown Location");
+      // Get user's location
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { longitude, latitude } = position.coords;
+            setUserLocation([longitude, latitude]);
+            map.current?.flyTo({
+              center: [longitude, latitude],
+              zoom: 13,
             });
-        },
-        () => {
-          toast({
-            title: "Location access denied",
-            description: "Using default map location",
-            status: "info",
-            duration: 3000,
-            isClosable: true,
-          });
-          setLocation("Unknown Location");
-        }
-      );
+
+            // Reverse geocode to get location name
+            fetch(
+              `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${mapboxgl.accessToken}`
+            )
+              .then((res) => res.json())
+              .then((data) => {
+                if (data.features && data.features.length > 0) {
+                  const place = data.features[0];
+                  setLocation(place.place_name || "Unknown Location");
+                }
+              })
+              .catch(() => {
+                setLocation("Unknown Location");
+              });
+          },
+          () => {
+            toast({
+              title: "Location access denied",
+              description: "Using default map location",
+              status: "info",
+              duration: 3000,
+              isClosable: true,
+            });
+            setLocation("Unknown Location");
+          }
+        );
+      }
+    } catch (error) {
+      console.error("Map initialization error:", error);
+      toast({
+        title: "Map Error",
+        description: "Failed to initialize map. Please refresh the page.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
     }
 
     return () => {

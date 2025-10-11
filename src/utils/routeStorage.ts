@@ -33,6 +33,7 @@ export const getRoutes = async (): Promise<Route[]> => {
     const routes = await response.json();
     // Transform MongoDB data to match frontend interface
     return routes.map((route: any) => ({
+      _id: route._id,
       id: route._id,
       name: route.name,
       distance: route.distance,
