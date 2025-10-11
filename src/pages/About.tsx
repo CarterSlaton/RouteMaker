@@ -8,20 +8,23 @@ import {
   Icon,
   useColorModeValue,
   Flex,
-  List,
-  ListItem,
-  ListIcon,
+  HStack,
+  Badge,
+  Divider,
+  Stack,
 } from "@chakra-ui/react";
 import {
-  FaRoute,
-  FaMapMarkedAlt,
-  FaRunning,
-  FaSave,
-  FaCheckCircle,
+  FaHeart,
+  FaLightbulb,
+  FaCode,
+  FaUsers,
+  FaRocket,
+  FaGithub,
+  FaLeaf,
+  FaMountain,
 } from "react-icons/fa";
 
 const About = () => {
-  const headerBg = useColorModeValue("white", "gray.800");
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const gradientBg = useColorModeValue(
@@ -29,150 +32,198 @@ const About = () => {
     "linear(to-r, teal.200, blue.200)"
   );
   const textColor = useColorModeValue("gray.600", "gray.300");
+  const accentBg = useColorModeValue("teal.50", "teal.900");
 
   return (
     <Box
       bg={useColorModeValue("gray.50", "gray.900")}
       minH="calc(100vh - 60px)"
-      display="flex"
-      flexDirection="column"
+      py={12}
     >
-      {/* Header Section */}
-      <Box
-        bg={headerBg}
-        boxShadow="sm"
-        position="sticky"
-        top="0"
-        zIndex="sticky"
-        py={4}
-        mb={8}
-        w="100%"
-      >
-        <Container maxW="container.xl" px={{ base: 4, md: 8 }}>
-          <VStack align="start" spacing={1}>
-            <Heading size="xl" bgGradient={gradientBg} bgClip="text">
-              About RouteMaker
-            </Heading>
-            <Text color="gray.500">
-              Your personal running route creation and management tool
-            </Text>
-          </VStack>
-        </Container>
-      </Box>
-
-      <Container maxW="container.xl" flex="1" px={{ base: 4, md: 8 }} pb={8}>
-        <VStack spacing={12} align="stretch">
-          <Box>
+      <Container maxW="container.xl" px={{ base: 4, md: 8 }}>
+        <VStack spacing={16} align="stretch">
+          {/* Hero Section */}
+          <VStack spacing={6} textAlign="center">
+            <Badge
+              colorScheme="teal"
+              fontSize="md"
+              px={4}
+              py={2}
+              borderRadius="full"
+            >
+              🏃 Our Story
+            </Badge>
             <Heading
-              size="lg"
-              mb={8}
+              size="2xl"
               bgGradient={gradientBg}
               bgClip="text"
-              display="inline-block"
+              fontSize={{ base: "3xl", md: "4xl", lg: "5xl" }}
             >
-              Features
+              Built by Runners, For Runners
             </Heading>
-            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8}>
-              <Feature
-                icon={FaRoute}
-                title="Route Creation"
-                description="Create custom running routes using our interactive map interface. Draw your path and see distance calculations in real-time."
+            <Text
+              fontSize={{ base: "lg", md: "xl" }}
+              color={textColor}
+              maxW="800px"
+              lineHeight="tall"
+            >
+              RouteMaker was born from a simple frustration: finding the perfect
+              running route shouldn't be hard. We created a tool that makes
+              route planning intuitive, enjoyable, and accessible to everyone.
+            </Text>
+          </VStack>
+
+          {/* Our Mission */}
+          <Box
+            bg={cardBg}
+            p={10}
+            borderRadius="3xl"
+            border="2px"
+            borderColor="teal.500"
+            boxShadow="2xl"
+            position="relative"
+            overflow="hidden"
+          >
+            <Box
+              position="absolute"
+              top="-50px"
+              right="-50px"
+              w="200px"
+              h="200px"
+              bgGradient={gradientBg}
+              opacity="0.1"
+              borderRadius="full"
+            />
+            <VStack spacing={6} align="start" position="relative">
+              <HStack spacing={3}>
+                <Icon as={FaHeart} boxSize={8} color="teal.500" />
+                <Heading size="lg" color="teal.500">
+                  Our Mission
+                </Heading>
+              </HStack>
+              <Text fontSize="lg" color={textColor} lineHeight="tall">
+                We believe that every runner deserves the perfect route. Whether
+                you're training for a marathon, exploring a new city, or just
+                looking for a scenic jog, RouteMaker empowers you to discover
+                and create routes that inspire you to keep moving forward.
+              </Text>
+            </VStack>
+          </Box>
+
+          {/* Why We Built This */}
+          <VStack spacing={8} align="stretch">
+            <Heading size="xl" textAlign="center">
+              Why RouteMaker Exists
+            </Heading>
+            <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8}>
+              <ValueCard
+                icon={FaLightbulb}
+                title="Innovation"
+                description="We saw a gap in the market for a truly user-friendly route planning tool. So we built it ourselves with modern technology and intuitive design."
                 gradient={gradientBg}
                 cardBg={cardBg}
                 borderColor={borderColor}
               />
-              <Feature
-                icon={FaMapMarkedAlt}
-                title="Map Integration"
-                description="Powered by Mapbox, our map interface provides detailed street views and satellite imagery to help you plan the perfect route."
+              <ValueCard
+                icon={FaUsers}
+                title="Community"
+                description="Running is better together. We're building a platform where runners can share their favorite routes and discover new ones from the community."
                 gradient={gradientBg}
                 cardBg={cardBg}
                 borderColor={borderColor}
               />
-              <Feature
-                icon={FaSave}
-                title="Save & Organize"
-                description="Save your favorite routes and access them anytime. Organize your routes by distance, location, or difficulty."
-                gradient={gradientBg}
-                cardBg={cardBg}
-                borderColor={borderColor}
-              />
-              <Feature
-                icon={FaRunning}
-                title="Runner-Focused"
-                description="Built with runners in mind, featuring distance tracking, elevation profiles, and estimated completion times."
+              <ValueCard
+                icon={FaLeaf}
+                title="Simplicity"
+                description="No clutter, no confusion, no unnecessary features. Just a clean, simple tool that does exactly what you need—plan amazing routes."
                 gradient={gradientBg}
                 cardBg={cardBg}
                 borderColor={borderColor}
               />
             </SimpleGrid>
+          </VStack>
+
+          {/* Tech Stack */}
+          <Box
+            bg={accentBg}
+            p={10}
+            borderRadius="2xl"
+            border="1px"
+            borderColor={borderColor}
+          >
+            <VStack spacing={6} align="start">
+              <HStack spacing={3}>
+                <Icon as={FaCode} boxSize={7} color="teal.600" />
+                <Heading size="lg" color="teal.600">
+                  Built With Modern Technology
+                </Heading>
+              </HStack>
+              <Text fontSize="lg" color={textColor} lineHeight="tall">
+                RouteMaker is powered by cutting-edge web technologies to ensure
+                a fast, reliable, and enjoyable experience:
+              </Text>
+              <SimpleGrid columns={{ base: 2, md: 4 }} spacing={4} w="full">
+                <TechBadge name="React" />
+                <TechBadge name="TypeScript" />
+                <TechBadge name="Mapbox GL" />
+                <TechBadge name="Node.js" />
+                <TechBadge name="MongoDB" />
+                <TechBadge name="Express" />
+                <TechBadge name="Chakra UI" />
+                <TechBadge name="JWT Auth" />
+              </SimpleGrid>
+            </VStack>
           </Box>
 
-          <Box>
-            <Heading
-              size="lg"
-              mb={6}
-              bgGradient={gradientBg}
-              bgClip="text"
-              display="inline-block"
-            >
-              How to Use
+          {/* Our Values */}
+          <VStack spacing={8}>
+            <Heading size="xl" textAlign="center">
+              What Drives Us
             </Heading>
-            <Box
-              bg={cardBg}
-              p={8}
-              borderRadius="2xl"
-              border="1px"
-              borderColor={borderColor}
-              boxShadow="xl"
-              _hover={{
-                transform: "translateY(-4px)",
-                boxShadow: "2xl",
-              }}
-              transition="all 0.2s"
-            >
-              <Text fontSize="lg" mb={6} color={textColor}>
-                Getting started with RouteMaker is easy:
+            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8} w="full">
+              <PrincipleCard
+                icon={FaRocket}
+                title="Speed & Performance"
+                description="Your time is valuable. We've optimized every aspect of RouteMaker to be lightning-fast, from map loading to route calculations."
+              />
+              <PrincipleCard
+                icon={FaMountain}
+                title="Accessibility"
+                description="Running should be for everyone. We're committed to making RouteMaker accessible and free for all runners, regardless of experience level."
+              />
+            </SimpleGrid>
+          </VStack>
+
+          {/* Open Source */}
+          <Box
+            bg={cardBg}
+            p={10}
+            borderRadius="2xl"
+            border="1px"
+            borderColor={borderColor}
+            boxShadow="xl"
+            textAlign="center"
+          >
+            <VStack spacing={6}>
+              <Icon as={FaGithub} boxSize={12} color="teal.500" />
+              <Heading size="lg">Open Source & Community Driven</Heading>
+              <Text
+                fontSize="lg"
+                color={textColor}
+                maxW="700px"
+                lineHeight="tall"
+              >
+                RouteMaker is an open-source project built with love for the
+                running community. We believe in transparency, collaboration,
+                and continuous improvement. Your feedback helps us make
+                RouteMaker better every day.
               </Text>
-              <List spacing={4}>
-                <ListItem
-                  display="flex"
-                  alignItems="center"
-                  fontSize="lg"
-                  color={textColor}
-                >
-                  <ListIcon as={FaCheckCircle} color="teal.500" />
-                  Navigate to the Create Route page
-                </ListItem>
-                <ListItem
-                  display="flex"
-                  alignItems="center"
-                  fontSize="lg"
-                  color={textColor}
-                >
-                  <ListIcon as={FaCheckCircle} color="teal.500" />
-                  Use the drawing tools to map out your route
-                </ListItem>
-                <ListItem
-                  display="flex"
-                  alignItems="center"
-                  fontSize="lg"
-                  color={textColor}
-                >
-                  <ListIcon as={FaCheckCircle} color="teal.500" />
-                  Save your route with a custom name
-                </ListItem>
-                <ListItem
-                  display="flex"
-                  alignItems="center"
-                  fontSize="lg"
-                  color={textColor}
-                >
-                  <ListIcon as={FaCheckCircle} color="teal.500" />
-                  Access your saved routes anytime from My Routes
-                </ListItem>
-              </List>
-            </Box>
+              <Divider />
+              <Text fontSize="md" color={textColor} fontStyle="italic">
+                "Every great route starts with a single step. Thanks for being
+                part of our journey!"
+              </Text>
+            </VStack>
           </Box>
         </VStack>
       </Container>
@@ -180,7 +231,7 @@ const About = () => {
   );
 };
 
-const Feature = ({
+const ValueCard = ({
   icon,
   title,
   description,
@@ -202,44 +253,99 @@ const Feature = ({
       borderRadius="2xl"
       border="1px"
       borderColor={borderColor}
-      boxShadow="xl"
-      position="relative"
-      overflow="hidden"
+      boxShadow="lg"
       _hover={{
-        transform: "translateY(-8px)",
+        transform: "translateY(-4px)",
         boxShadow: "2xl",
+        borderColor: "teal.500",
       }}
       transition="all 0.3s ease-in-out"
     >
-      <Box
-        position="absolute"
-        top="-20px"
-        right="-20px"
-        w="100px"
-        h="100px"
-        bgGradient={gradient}
-        opacity="0.1"
-        borderRadius="full"
-      />
-      <Flex
-        w={12}
-        h={12}
-        bgGradient={gradient}
-        color="white"
-        borderRadius="xl"
-        align="center"
-        justify="center"
-        mb={4}
-      >
-        <Icon as={icon} w={6} h={6} />
-      </Flex>
-      <Heading size="md" mb={4} bgGradient={gradient} bgClip="text">
-        {title}
-      </Heading>
-      <Text color={useColorModeValue("gray.600", "gray.300")}>
-        {description}
-      </Text>
+      <VStack spacing={4} align="center" textAlign="center">
+        <Flex
+          w={16}
+          h={16}
+          bgGradient={gradient}
+          color="white"
+          borderRadius="full"
+          align="center"
+          justify="center"
+        >
+          <Icon as={icon} boxSize={8} />
+        </Flex>
+        <Heading size="md" bgGradient={gradient} bgClip="text">
+          {title}
+        </Heading>
+        <Text
+          color={useColorModeValue("gray.600", "gray.300")}
+          lineHeight="tall"
+        >
+          {description}
+        </Text>
+      </VStack>
     </Box>
+  );
+};
+
+const PrincipleCard = ({
+  icon,
+  title,
+  description,
+}: {
+  icon: any;
+  title: string;
+  description: string;
+}) => {
+  const cardBg = useColorModeValue("white", "gray.800");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
+
+  return (
+    <Box
+      p={8}
+      bg={cardBg}
+      borderRadius="xl"
+      border="1px"
+      borderColor={borderColor}
+      boxShadow="md"
+    >
+      <Stack spacing={4}>
+        <HStack spacing={3}>
+          <Icon as={icon} boxSize={6} color="teal.500" />
+          <Heading size="md">{title}</Heading>
+        </HStack>
+        <Text
+          color={useColorModeValue("gray.600", "gray.300")}
+          lineHeight="tall"
+        >
+          {description}
+        </Text>
+      </Stack>
+    </Box>
+  );
+};
+
+const TechBadge = ({ name }: { name: string }) => {
+  const bg = useColorModeValue("white", "gray.700");
+
+  return (
+    <Badge
+      bg={bg}
+      color="teal.600"
+      px={4}
+      py={2}
+      borderRadius="lg"
+      fontSize="md"
+      fontWeight="semibold"
+      border="1px"
+      borderColor={useColorModeValue("teal.200", "teal.700")}
+      _hover={{
+        transform: "scale(1.05)",
+        bg: useColorModeValue("teal.50", "teal.800"),
+      }}
+      transition="all 0.2s"
+    >
+      {name}
+    </Badge>
   );
 };
 
