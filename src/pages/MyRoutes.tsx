@@ -12,17 +12,16 @@ import {
   useColorModeValue,
   Badge,
   Flex,
-  keyframes,
   Tooltip,
   Input,
   InputGroup,
   InputLeftElement,
 } from "@chakra-ui/react";
+import { keyframes } from "@emotion/react";
 import { useNavigate } from "react-router-dom";
 import {
   FaMapMarkerAlt,
   FaRoute,
-  FaRunning,
   FaCalendarAlt,
   FaChevronRight,
   FaSearch,

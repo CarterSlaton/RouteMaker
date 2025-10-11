@@ -9,9 +9,9 @@ import {
   useColorModeValue,
   Icon,
   Flex,
-  keyframes,
   HStack,
 } from "@chakra-ui/react";
+import { keyframes } from "@emotion/react";
 import { useNavigate } from "react-router-dom";
 import {
   FaRoute,
