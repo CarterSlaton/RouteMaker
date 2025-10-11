@@ -1,23 +1,36 @@
-// Route storage utility using LocalStorage
+// Route storage utility using MongoDB API
 
 export interface Route {
-  id: string;
+  id?: string;
+  _id?: string;
   name: string;
   distance: number;
   location: string;
   date: string;
   difficulty: "Easy" | "Moderate" | "Hard";
   coordinates: number[][];
-  createdAt: number;
+  createdAt?: string | number;
 }
 
-const STORAGE_KEY = "routemaker_routes";
+const API_URL = "http://localhost:5000/api/routes";
 
-// Get all routes from localStorage
-export const getRoutes = (): Route[] => {
+// Get all routes from API
+export const getRoutes = async (): Promise<Route[]> => {
   try {
-    const routes = localStorage.getItem(STORAGE_KEY);
-    return routes ? JSON.parse(routes) : [];
+    const response = await fetch(API_URL);
+    if (!response.ok) throw new Error("Failed to fetch routes");
+    const routes = await response.json();
+    // Transform MongoDB data to match frontend interface
+    return routes.map((route: any) => ({
+      id: route._id,
+      name: route.name,
+      distance: route.distance,
+      location: "", // Will be populated by frontend
+      date: new Date(route.createdAt).toLocaleDateString(),
+      difficulty: route.difficulty,
+      coordinates: route.coordinates.coordinates,
+      createdAt: route.createdAt
+    }));
   } catch (error) {
     console.error("Error loading routes:", error);
     return [];
@@ -25,17 +38,34 @@ export const getRoutes = (): Route[] => {
 };
 
 // Save a new route
-export const saveRoute = (route: Omit<Route, "id" | "createdAt">): Route => {
+export const saveRoute = async (route: Omit<Route, "id" | "createdAt">): Promise<Route> => {
   try {
-    const routes = getRoutes();
-    const newRoute: Route = {
-      ...route,
-      id: generateId(),
-      createdAt: Date.now(),
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: route.name,
+        distance: route.distance,
+        difficulty: route.difficulty,
+        coordinates: route.coordinates,
+      }),
+    });
+
+    if (!response.ok) throw new Error("Failed to save route");
+    const savedRoute = await response.json();
+    
+    return {
+      id: savedRoute._id,
+      name: savedRoute.name,
+      distance: savedRoute.distance,
+      location: route.location,
+      date: new Date(savedRoute.createdAt).toLocaleDateString(),
+      difficulty: savedRoute.difficulty,
+      coordinates: savedRoute.coordinates.coordinates,
+      createdAt: savedRoute.createdAt
     };
-    routes.push(newRoute);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(routes));
-    return newRoute;
   } catch (error) {
     console.error("Error saving route:", error);
     throw error;
@@ -43,12 +73,12 @@ export const saveRoute = (route: Omit<Route, "id" | "createdAt">): Route => {
 };
 
 // Delete a route by ID
-export const deleteRoute = (id: string): boolean => {
+export const deleteRoute = async (id: string): Promise<boolean> => {
   try {
-    const routes = getRoutes();
-    const filteredRoutes = routes.filter((route) => route.id !== id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(filteredRoutes));
-    return true;
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: "DELETE",
+    });
+    return response.ok;
   } catch (error) {
     console.error("Error deleting route:", error);
     return false;
@@ -56,15 +86,29 @@ export const deleteRoute = (id: string): boolean => {
 };
 
 // Update an existing route
-export const updateRoute = (id: string, updates: Partial<Route>): Route | null => {
+export const updateRoute = async (id: string, updates: Partial<Route>): Promise<Route | null> => {
   try {
-    const routes = getRoutes();
-    const index = routes.findIndex((route) => route.id === id);
-    if (index === -1) return null;
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updates),
+    });
 
-    routes[index] = { ...routes[index], ...updates };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(routes));
-    return routes[index];
+    if (!response.ok) return null;
+    const updatedRoute = await response.json();
+    
+    return {
+      id: updatedRoute._id,
+      name: updatedRoute.name,
+      distance: updatedRoute.distance,
+      location: updates.location || "",
+      date: new Date(updatedRoute.createdAt).toLocaleDateString(),
+      difficulty: updatedRoute.difficulty,
+      coordinates: updatedRoute.coordinates.coordinates,
+      createdAt: updatedRoute.createdAt
+    };
   } catch (error) {
     console.error("Error updating route:", error);
     return null;
@@ -72,29 +116,43 @@ export const updateRoute = (id: string, updates: Partial<Route>): Route | null =
 };
 
 // Get a single route by ID
-export const getRoute = (id: string): Route | null => {
-  const routes = getRoutes();
-  return routes.find((route) => route.id === id) || null;
-};
-
-// Generate a unique ID
-const generateId = (): string => {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+export const getRoute = async (id: string): Promise<Route | null> => {
+  try {
+    const response = await fetch(`${API_URL}/${id}`);
+    if (!response.ok) return null;
+    const route = await response.json();
+    
+    return {
+      id: route._id,
+      name: route.name,
+      distance: route.distance,
+      location: "",
+      date: new Date(route.createdAt).toLocaleDateString(),
+      difficulty: route.difficulty,
+      coordinates: route.coordinates.coordinates,
+      createdAt: route.createdAt
+    };
+  } catch (error) {
+    console.error("Error fetching route:", error);
+    return null;
+  }
 };
 
 // Get route statistics
-export const getRouteStats = () => {
-  const routes = getRoutes();
-  return {
-    totalRoutes: routes.length,
-    totalDistance: routes.reduce((sum, route) => sum + route.distance, 0),
-    averageDistance: routes.length > 0 
-      ? routes.reduce((sum, route) => sum + route.distance, 0) / routes.length 
-      : 0,
-    byDifficulty: {
-      easy: routes.filter((r) => r.difficulty === "Easy").length,
-      moderate: routes.filter((r) => r.difficulty === "Moderate").length,
-      hard: routes.filter((r) => r.difficulty === "Hard").length,
-    },
-  };
+export const getRouteStats = async () => {
+  try {
+    const response = await fetch(`${API_URL}/stats/summary`);
+    if (!response.ok) throw new Error("Failed to fetch stats");
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching stats:", error);
+    const routes = await getRoutes();
+    return {
+      totalRoutes: routes.length,
+      totalDistance: routes.reduce((sum, route) => sum + route.distance, 0),
+      averageDistance: routes.length > 0 
+        ? routes.reduce((sum, route) => sum + route.distance, 0) / routes.length 
+        : 0,
+    };
+  }
 };

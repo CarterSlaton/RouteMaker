@@ -247,7 +247,7 @@ const CreateRoute = () => {
     onOpen();
   };
 
-  const confirmSaveRoute = () => {
+  const confirmSaveRoute = async () => {
     if (!routeName.trim()) {
       toast({
         title: "Name required",
@@ -264,7 +264,7 @@ const CreateRoute = () => {
     const coordinates = route.geometry.coordinates;
 
     try {
-      saveRoute({
+      await saveRoute({
         name: routeName.trim(),
         distance: parseFloat(distance.toFixed(2)),
         location: location || "Unknown Location",

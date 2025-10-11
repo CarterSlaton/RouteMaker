@@ -59,12 +59,19 @@ const MyRoutes = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement>(null);
 
-  // Load routes from localStorage on mount
+  // Load routes from API on mount
   useEffect(() => {
-    const loadedRoutes = getRoutes();
-    // Sort by date (newest first)
-    loadedRoutes.sort((a, b) => b.createdAt - a.createdAt);
-    setRoutes(loadedRoutes);
+    const loadRoutes = async () => {
+      const loadedRoutes = await getRoutes();
+      // Sort by date (newest first)
+      loadedRoutes.sort((a: any, b: any) => {
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
+        return dateB - dateA;
+      });
+      setRoutes(loadedRoutes);
+    };
+    loadRoutes();
   }, []);
 
   // Mock data with coordinates for the route preview (keeping for backwards compatibility)
@@ -223,10 +230,12 @@ const MyRoutes = () => {
     onOpen();
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (routeToDelete) {
-      deleteRoute(routeToDelete);
-      setRoutes(routes.filter((r) => r.id !== routeToDelete));
+      const success = await deleteRoute(routeToDelete);
+      if (success) {
+        setRoutes(routes.filter((r) => r.id !== routeToDelete));
+      }
       setRouteToDelete(null);
     }
     onClose();
