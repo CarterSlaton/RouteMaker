@@ -316,12 +316,20 @@ const RouteDetails = () => {
             borderColor={borderColor}
           >
             <VStack spacing={3} align="start">
-              <Heading size="sm" color="teal.600">
+              <Heading
+                size="sm"
+                color={useColorModeValue("teal.600", "teal.300")}
+              >
                 Route Information
               </Heading>
               <Stack spacing={2} w="full">
                 <HStack justify="space-between">
-                  <Text fontWeight="medium">Created:</Text>
+                  <Text
+                    fontWeight="medium"
+                    color={useColorModeValue("gray.700", "gray.200")}
+                  >
+                    Created:
+                  </Text>
                   <Text color={textColor}>
                     {route.createdAt
                       ? new Date(route.createdAt).toLocaleString()
@@ -329,7 +337,12 @@ const RouteDetails = () => {
                   </Text>
                 </HStack>
                 <HStack justify="space-between">
-                  <Text fontWeight="medium">Route ID:</Text>
+                  <Text
+                    fontWeight="medium"
+                    color={useColorModeValue("gray.700", "gray.200")}
+                  >
+                    Route ID:
+                  </Text>
                   <Text color={textColor} fontSize="sm" fontFamily="mono">
                     {route._id}
                   </Text>
@@ -349,7 +362,12 @@ const RouteDetails = () => {
               boxShadow="xl"
             >
               <VStack spacing={4} align="stretch">
-                <Heading size="md">Elevation Profile</Heading>
+                <Heading
+                  size="md"
+                  color={useColorModeValue("gray.800", "white")}
+                >
+                  Elevation Profile
+                </Heading>
                 <Divider />
                 <ElevationChart
                   elevationProfile={route.elevationData.profile}
@@ -359,7 +377,11 @@ const RouteDetails = () => {
                     <Text fontSize="sm" color={textColor}>
                       Min Elevation
                     </Text>
-                    <Text fontSize="xl" fontWeight="bold">
+                    <Text
+                      fontSize="xl"
+                      fontWeight="bold"
+                      color={useColorModeValue("gray.800", "white")}
+                    >
                       {route.elevationData.minElevation}m
                     </Text>
                   </Box>
@@ -367,7 +389,11 @@ const RouteDetails = () => {
                     <Text fontSize="sm" color={textColor}>
                       Max Elevation
                     </Text>
-                    <Text fontSize="xl" fontWeight="bold">
+                    <Text
+                      fontSize="xl"
+                      fontWeight="bold"
+                      color={useColorModeValue("gray.800", "white")}
+                    >
                       {formatElevation(route.elevationData.maxElevation)}
                     </Text>
                   </Box>
@@ -375,7 +401,11 @@ const RouteDetails = () => {
                     <Text fontSize="sm" color={textColor}>
                       Total Gain
                     </Text>
-                    <Text fontSize="xl" fontWeight="bold" color="green.500">
+                    <Text
+                      fontSize="xl"
+                      fontWeight="bold"
+                      color={useColorModeValue("green.600", "green.400")}
+                    >
                       +{formatElevation(route.elevationData.elevationGain)}
                     </Text>
                   </Box>
@@ -383,7 +413,11 @@ const RouteDetails = () => {
                     <Text fontSize="sm" color={textColor}>
                       Total Loss
                     </Text>
-                    <Text fontSize="xl" fontWeight="bold" color="red.500">
+                    <Text
+                      fontSize="xl"
+                      fontWeight="bold"
+                      color={useColorModeValue("red.600", "red.400")}
+                    >
                       -{formatElevation(route.elevationData.elevationLoss)}
                     </Text>
                   </Box>

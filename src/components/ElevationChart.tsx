@@ -31,8 +31,8 @@ interface ElevationChartProps {
 
 const ElevationChart = ({ elevationProfile }: ElevationChartProps) => {
   const bgColor = useColorModeValue("white", "gray.800");
-  const gridColor = useColorModeValue("gray.200", "gray.600");
-  const textColor = useColorModeValue("gray.700", "gray.300");
+  const gridColor = useColorModeValue("#E2E8F0", "#4A5568");
+  const textColor = useColorModeValue("#4A5568", "#E2E8F0");
   const { preferredUnit, convertDistance } = useDistanceUnit();
 
   const distanceUnit = preferredUnit === "km" ? "km" : "mi";

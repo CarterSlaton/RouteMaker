@@ -6,6 +6,15 @@ export interface IUser extends Document {
   email: string;
   password: string;
   preferredUnit: 'km' | 'mi'; // User's preferred distance unit
+  // Map Preferences
+  mapStyle: 'streets-v12' | 'satellite-streets-v12' | 'outdoors-v12' | 'dark-v11';
+  defaultZoom: number;
+  autoSaveRoutes: boolean;
+  // Display Preferences
+  compactView: boolean;
+  showRoutePreview: boolean;
+  reduceAnimations: boolean;
+  fontSize: 'small' | 'medium' | 'large';
   createdAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
@@ -33,6 +42,40 @@ const UserSchema: Schema = new Schema({
     type: String,
     enum: ['km', 'mi'],
     default: 'km' // Default to kilometers
+  },
+  // Map Preferences
+  mapStyle: {
+    type: String,
+    enum: ['streets-v12', 'satellite-streets-v12', 'outdoors-v12', 'dark-v11'],
+    default: 'streets-v12'
+  },
+  defaultZoom: {
+    type: Number,
+    default: 12,
+    min: 1,
+    max: 20
+  },
+  autoSaveRoutes: {
+    type: Boolean,
+    default: true
+  },
+  // Display Preferences
+  compactView: {
+    type: Boolean,
+    default: false
+  },
+  showRoutePreview: {
+    type: Boolean,
+    default: true
+  },
+  reduceAnimations: {
+    type: Boolean,
+    default: false
+  },
+  fontSize: {
+    type: String,
+    enum: ['small', 'medium', 'large'],
+    default: 'medium'
   },
   createdAt: {
     type: Date,

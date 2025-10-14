@@ -24,11 +24,17 @@ const UserSection = () => {
 
   if (!user) return null;
 
+  const textColor = useColorModeValue("gray.800", "white");
+
   return (
     <Flex align="center" gap={3}>
       <Flex align="center" gap={2}>
         <Avatar size="sm" name={user.name} bg="teal.500" />
-        <Text display={{ base: "none", md: "block" }} fontWeight="medium">
+        <Text
+          display={{ base: "none", md: "block" }}
+          fontWeight="medium"
+          color={textColor}
+        >
           {user.name}
         </Text>
       </Flex>
@@ -54,9 +60,11 @@ const Navbar = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const inactiveColor = useColorModeValue("gray.600", "gray.300");
+
   const navLinkStyles = (path: string): SystemStyleObject => ({
     position: "relative" as const,
-    color: isActive(path) ? "teal.500" : "gray.600",
+    color: isActive(path) ? "teal.500" : inactiveColor,
     fontWeight: "medium",
     textDecoration: "none",
     transition: "all 0.3s ease",

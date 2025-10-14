@@ -6,6 +6,19 @@ interface User {
   name: string;
   email: string;
   preferredUnit?: "km" | "mi";
+  // Map Preferences
+  mapStyle?:
+    | "streets-v12"
+    | "satellite-streets-v12"
+    | "outdoors-v12"
+    | "dark-v11";
+  defaultZoom?: number;
+  autoSaveRoutes?: boolean;
+  // Display Preferences
+  compactView?: boolean;
+  showRoutePreview?: boolean;
+  reduceAnimations?: boolean;
+  fontSize?: "small" | "medium" | "large";
 }
 
 interface AuthContextType {
@@ -15,6 +28,7 @@ interface AuthContextType {
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   updatePreferredUnit: (unit: "km" | "mi") => Promise<void>;
+  updatePreferences: (preferences: Partial<User>) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -127,6 +141,33 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const updatePreferences = async (preferences: Partial<User>) => {
+    try {
+      const response = await fetch(`${API_URL}/auth/preferences`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(preferences),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update preferences");
+      }
+
+      // Update user in state and localStorage
+      const updatedUser = { ...user!, ...preferences };
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    } catch (error) {
+      console.error("Error updating preferences:", error);
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -136,6 +177,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         register,
         logout,
         updatePreferredUnit,
+        updatePreferences,
         isLoading,
       }}
     >
