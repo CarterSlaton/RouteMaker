@@ -16,6 +16,7 @@ const CreateRoute = lazy(() => import("./pages/CreateRoute"));
 const MyRoutes = lazy(() => import("./pages/MyRoutes"));
 const RouteDetails = lazy(() => import("./pages/RouteDetails"));
 const About = lazy(() => import("./pages/About"));
+const Settings = lazy(() => import("./pages/Settings"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 
@@ -96,6 +97,14 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <About />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/settings"
+                    element={
+                      <ProtectedRoute>
+                        <Settings />
                       </ProtectedRoute>
                     }
                   />

@@ -29,6 +29,8 @@ import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { FaRoute, FaSave, FaRuler } from "react-icons/fa";
 import { saveRoute } from "../utils/routeStorage";
 import { useNavigate } from "react-router-dom";
+import { useDistanceUnit } from "../utils/useDistanceUnit";
+import { milesToKm } from "../utils/unitConversion";
 
 // Initialize Mapbox access token
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || "";
@@ -54,6 +56,7 @@ const CreateRoute = () => {
   } = useDisclosure();
   const toast = useToast();
   const navigate = useNavigate();
+  const { preferredUnit, formatDistance } = useDistanceUnit();
 
   const headerBg = useColorModeValue("white", "gray.800");
   const cardBg = useColorModeValue("white", "gray.800");
@@ -328,9 +331,9 @@ const CreateRoute = () => {
   };
 
   const generateAutoRoute = async () => {
-    const target = parseFloat(targetDistance);
+    const inputDistance = parseFloat(targetDistance);
 
-    if (!target || target <= 0) {
+    if (!inputDistance || inputDistance <= 0) {
       toast({
         title: "Invalid distance",
         description: "Please enter a valid distance greater than 0",
@@ -354,6 +357,10 @@ const CreateRoute = () => {
 
     setIsGenerating(true);
     onGenerateClose();
+
+    // Convert to km if user is using miles
+    const target =
+      preferredUnit === "mi" ? milesToKm(inputDistance) : inputDistance;
 
     const MAX_ATTEMPTS = 3;
     const TARGET_ERROR = 0.07; // 7% error tolerance
@@ -422,7 +429,7 @@ const CreateRoute = () => {
           if (distanceError <= TARGET_ERROR) {
             toast({
               title: "Perfect route generated!",
-              description: `Created a ${routeDistance.toFixed(2)} km loop (${(
+              description: `Created a ${formatDistance(routeDistance)} loop (${(
                 distanceError * 100
               ).toFixed(1)}% accuracy)${
                 attempt > 1 ? ` on attempt ${attempt}` : ""
@@ -440,11 +447,11 @@ const CreateRoute = () => {
               // Within 12% is acceptable
               toast({
                 title: "Route generated",
-                description: `Best route: ${bestRoute.distance.toFixed(
-                  2
-                )} km (target: ${target} km, ${(bestError * 100).toFixed(
-                  1
-                )}% off)`,
+                description: `Best route: ${formatDistance(
+                  bestRoute.distance
+                )} (target: ${formatDistance(target)}, ${(
+                  bestError * 100
+                ).toFixed(1)}% off)`,
                 status: "info",
                 duration: 5000,
                 isClosable: true,
@@ -452,9 +459,9 @@ const CreateRoute = () => {
             } else {
               toast({
                 title: "Route generated with higher variance",
-                description: `Generated ${bestRoute.distance.toFixed(
-                  2
-                )} km route. You can adjust manually if needed.`,
+                description: `Generated ${formatDistance(
+                  bestRoute.distance
+                )} route. You can adjust manually if needed.`,
                 status: "warning",
                 duration: 5000,
                 isClosable: true,
@@ -588,7 +595,7 @@ const CreateRoute = () => {
                   fontSize="md"
                 >
                   <Icon as={FaRoute} />
-                  {distance.toFixed(2)} km
+                  {formatDistance(distance)}
                 </Badge>
                 <Badge
                   colorScheme={getDifficultyColor(difficulty)}
@@ -622,7 +629,7 @@ const CreateRoute = () => {
           <HStack spacing={6}>
             <HStack>
               <Icon as={FaRuler} color="teal.500" />
-              <Text fontSize="lg">Distance: {distance.toFixed(2)} km</Text>
+              <Text fontSize="lg">Distance: {formatDistance(distance)}</Text>
             </HStack>
             <HStack>
               <Icon as={FaRoute} color="teal.500" />
@@ -693,7 +700,7 @@ const CreateRoute = () => {
                 <VStack spacing={2} align="stretch">
                   <HStack justify="space-between">
                     <Text color="gray.500">Distance:</Text>
-                    <Text fontWeight="bold">{distance.toFixed(2)} km</Text>
+                    <Text fontWeight="bold">{formatDistance(distance)}</Text>
                   </HStack>
                   <HStack justify="space-between">
                     <Text color="gray.500">Difficulty:</Text>
@@ -732,13 +739,15 @@ const CreateRoute = () => {
           <ModalBody pb={6}>
             <VStack spacing={4}>
               <FormControl isRequired>
-                <FormLabel>Target Distance (km)</FormLabel>
+                <FormLabel>Target Distance ({preferredUnit})</FormLabel>
                 <Input
                   type="number"
                   step="0.1"
                   min="0.5"
                   max="50"
-                  placeholder="e.g., 5.0"
+                  placeholder={`e.g., ${
+                    preferredUnit === "km" ? "5.0" : "3.1"
+                  }`}
                   value={targetDistance}
                   onChange={(e) => setTargetDistance(e.target.value)}
                   autoFocus

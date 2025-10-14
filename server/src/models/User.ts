@@ -5,6 +5,7 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
+  preferredUnit: 'km' | 'mi'; // User's preferred distance unit
   createdAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
@@ -27,6 +28,11 @@ const UserSchema: Schema = new Schema({
     type: String,
     required: true,
     minlength: 6
+  },
+  preferredUnit: {
+    type: String,
+    enum: ['km', 'mi'],
+    default: 'km' // Default to kilometers
   },
   createdAt: {
     type: Date,

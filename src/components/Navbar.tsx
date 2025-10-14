@@ -10,23 +10,19 @@ import {
   Button,
   Text,
   Avatar,
+  Icon,
 } from "@chakra-ui/react";
 import type { SystemStyleObject } from "@chakra-ui/react";
-import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
+import { Link as RouterLink, useLocation } from "react-router-dom";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
+import { FaCog } from "react-icons/fa";
 import { RunnerIcon } from "./RunnerIcon";
 import { useAuth } from "../contexts/AuthContext";
 
 const UserSection = () => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
 
   if (!user) return null;
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
 
   return (
     <Flex align="center" gap={3}>
@@ -37,12 +33,14 @@ const UserSection = () => {
         </Text>
       </Flex>
       <Button
-        onClick={handleLogout}
+        as={RouterLink}
+        to="/settings"
+        leftIcon={<Icon as={FaCog} />}
         colorScheme="teal"
         variant="outline"
         size="sm"
       >
-        Logout
+        Settings
       </Button>
     </Flex>
   );

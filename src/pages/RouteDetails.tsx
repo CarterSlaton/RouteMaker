@@ -32,9 +32,14 @@ import {
   FaTrash,
   FaRuler,
   FaTachometerAlt,
+  FaArrowDown,
+  FaArrowUp,
 } from "react-icons/fa";
 import { getRoutes, deleteRoute, type Route } from "../utils/routeStorage";
 import RouteMap from "../components/RouteMap";
+import ElevationChart from "../components/ElevationChart";
+import DirectionsList from "../components/DirectionsList";
+import { useDistanceUnit } from "../utils/useDistanceUnit";
 
 const RouteDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -44,6 +49,7 @@ const RouteDetails = () => {
   const [loading, setLoading] = useState(true);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement>(null);
+  const { formatDistance, formatElevation } = useDistanceUnit();
 
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
@@ -53,6 +59,7 @@ const RouteDetails = () => {
   );
   const textColor = useColorModeValue("gray.600", "gray.300");
   const accentBg = useColorModeValue("teal.50", "teal.900");
+  const pageBg = useColorModeValue("gray.50", "gray.900");
 
   // Load route data
   useEffect(() => {
@@ -64,6 +71,9 @@ const RouteDetails = () => {
           return routeId === id;
         });
         if (foundRoute) {
+          console.log("🗺️ Route loaded:", foundRoute);
+          console.log("📊 Elevation data:", foundRoute.elevationData);
+          console.log("🧭 Directions:", foundRoute.directions);
           setRoute(foundRoute);
         } else {
           toast({
@@ -158,13 +168,9 @@ const RouteDetails = () => {
   }
 
   return (
-    <Box
-      bg={useColorModeValue("gray.50", "gray.900")}
-      minH="calc(100vh - 60px)"
-      py={8}
-    >
+    <Box bg={pageBg} minH="calc(100vh - 60px)" py={8}>
       <Container maxW="container.xl" px={{ base: 4, md: 8 }}>
-        <VStack spacing={8} align="stretch">
+        <Stack spacing={8}>
           {/* Back Button */}
           <Button
             leftIcon={<Icon as={FaArrowLeft} />}
@@ -224,11 +230,14 @@ const RouteDetails = () => {
           </Box>
 
           {/* Route Stats */}
-          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
+          <SimpleGrid
+            columns={{ base: 1, md: route.elevationData ? 5 : 3 }}
+            spacing={6}
+          >
             <StatCard
               icon={FaRuler}
               label="Distance"
-              value={`${route.distance.toFixed(2)} km`}
+              value={formatDistance(route.distance)}
               gradient={gradientBg}
               bg={cardBg}
               borderColor={borderColor}
@@ -249,6 +258,26 @@ const RouteDetails = () => {
               bg={cardBg}
               borderColor={borderColor}
             />
+            {route.elevationData && (
+              <>
+                <StatCard
+                  icon={FaArrowUp}
+                  label="Elevation Gain"
+                  value={formatElevation(route.elevationData.elevationGain)}
+                  gradient={gradientBg}
+                  bg={cardBg}
+                  borderColor={borderColor}
+                />
+                <StatCard
+                  icon={FaArrowDown}
+                  label="Elevation Loss"
+                  value={formatElevation(route.elevationData.elevationLoss)}
+                  gradient={gradientBg}
+                  bg={cardBg}
+                  borderColor={borderColor}
+                />
+              </>
+            )}
           </SimpleGrid>
 
           {/* Map */}
@@ -272,11 +301,7 @@ const RouteDetails = () => {
               >
                 <HStack>
                   <Box w={3} h={3} bg="green.500" borderRadius="full" />
-                  <Text>Start</Text>
-                </HStack>
-                <HStack>
-                  <Box w={3} h={3} bg="red.500" borderRadius="full" />
-                  <Text>End</Text>
+                  <Text>Start / End</Text>
                 </HStack>
               </HStack>
             </VStack>
@@ -312,7 +337,82 @@ const RouteDetails = () => {
               </Stack>
             </VStack>
           </Box>
-        </VStack>
+
+          {/* Elevation Profile */}
+          {route.elevationData && route.elevationData.profile.length > 0 && (
+            <Box
+              bg={cardBg}
+              p={6}
+              borderRadius="2xl"
+              border="1px"
+              borderColor={borderColor}
+              boxShadow="xl"
+            >
+              <VStack spacing={4} align="stretch">
+                <Heading size="md">Elevation Profile</Heading>
+                <Divider />
+                <ElevationChart
+                  elevationProfile={route.elevationData.profile}
+                />
+                <SimpleGrid columns={{ base: 2, md: 4 }} spacing={4} mt={2}>
+                  <Box textAlign="center">
+                    <Text fontSize="sm" color={textColor}>
+                      Min Elevation
+                    </Text>
+                    <Text fontSize="xl" fontWeight="bold">
+                      {route.elevationData.minElevation}m
+                    </Text>
+                  </Box>
+                  <Box textAlign="center">
+                    <Text fontSize="sm" color={textColor}>
+                      Max Elevation
+                    </Text>
+                    <Text fontSize="xl" fontWeight="bold">
+                      {formatElevation(route.elevationData.maxElevation)}
+                    </Text>
+                  </Box>
+                  <Box textAlign="center">
+                    <Text fontSize="sm" color={textColor}>
+                      Total Gain
+                    </Text>
+                    <Text fontSize="xl" fontWeight="bold" color="green.500">
+                      +{formatElevation(route.elevationData.elevationGain)}
+                    </Text>
+                  </Box>
+                  <Box textAlign="center">
+                    <Text fontSize="sm" color={textColor}>
+                      Total Loss
+                    </Text>
+                    <Text fontSize="xl" fontWeight="bold" color="red.500">
+                      -{formatElevation(route.elevationData.elevationLoss)}
+                    </Text>
+                  </Box>
+                </SimpleGrid>
+              </VStack>
+            </Box>
+          )}
+
+          {/* Turn-by-Turn Directions */}
+          {route.directions && route.directions.length > 0 && (
+            <Box
+              bg={cardBg}
+              p={6}
+              borderRadius="2xl"
+              border="1px"
+              borderColor={borderColor}
+              boxShadow="xl"
+            >
+              <VStack spacing={4} align="stretch">
+                <Heading size="md">Turn-by-Turn Directions</Heading>
+                <Text fontSize="sm" color={textColor}>
+                  Follow these directions to navigate your route
+                </Text>
+                <Divider />
+                <DirectionsList directions={route.directions} />
+              </VStack>
+            </Box>
+          )}
+        </Stack>
       </Container>
 
       {/* Delete Confirmation Dialog */}

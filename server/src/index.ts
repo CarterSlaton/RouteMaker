@@ -11,6 +11,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI || '';
+const MAPBOX_TOKEN = process.env.MAPBOX_ACCESS_TOKEN || '';
+console.log('🗺️ Mapbox token loaded:', MAPBOX_TOKEN ? '✅ Yes' : '❌ No');
 
 // Middleware
 app.use(cors());

@@ -37,7 +37,10 @@ const RouteMap = memo(({ route, height = "500px" }: RouteMapProps) => {
         container: mapContainer.current,
         style: "mapbox://styles/mapbox/streets-v12",
         bounds: bounds,
-        fitBoundsOptions: { padding: 50 },
+        fitBoundsOptions: {
+          padding: { top: 80, bottom: 80, left: 80, right: 80 },
+          maxZoom: 15,
+        },
       });
 
       map.current.on("load", () => {
@@ -71,15 +74,17 @@ const RouteMap = memo(({ route, height = "500px" }: RouteMapProps) => {
           },
         });
 
-        // Add start marker
+        // Add start/end marker (green dot)
         new mapboxgl.Marker({ color: "#38A169" })
           .setLngLat(coordinates[0])
           .addTo(map.current);
 
-        // Add end marker
-        new mapboxgl.Marker({ color: "#E53E3E" })
-          .setLngLat(coordinates[coordinates.length - 1])
-          .addTo(map.current);
+        // Ensure the route fits in view after everything is loaded
+        map.current.fitBounds(bounds, {
+          padding: { top: 80, bottom: 80, left: 80, right: 80 },
+          maxZoom: 15,
+          duration: 0,
+        });
       });
     } catch (error) {
       console.error("Error initializing map:", error);

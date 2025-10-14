@@ -5,6 +5,7 @@ interface User {
   id: string;
   name: string;
   email: string;
+  preferredUnit?: "km" | "mi";
 }
 
 interface AuthContextType {
@@ -13,6 +14,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
+  updatePreferredUnit: (unit: "km" | "mi") => Promise<void>;
   isLoading: boolean;
 }
 
@@ -98,9 +100,44 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     localStorage.removeItem("user");
   };
 
+  const updatePreferredUnit = async (unit: "km" | "mi") => {
+    try {
+      const response = await fetch(`${API_URL}/auth/preferences`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ preferredUnit: unit }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update preferences");
+      }
+
+      // Update user in state and localStorage
+      const updatedUser = { ...user!, preferredUnit: unit };
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    } catch (error) {
+      console.error("Error updating preferences:", error);
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, token, login, register, logout, isLoading }}
+      value={{
+        user,
+        token,
+        login,
+        register,
+        logout,
+        updatePreferredUnit,
+        isLoading,
+      }}
     >
       {children}
     </AuthContext.Provider>

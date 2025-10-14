@@ -34,10 +34,13 @@ import {
   FaChevronRight,
   FaSearch,
   FaTrash,
+  FaRunning,
+  FaPlus,
 } from "react-icons/fa";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { getRoutes, deleteRoute, type Route } from "../utils/routeStorage";
 import RouteCardSkeleton from "../components/RouteCardSkeleton";
+import { useDistanceUnit } from "../utils/useDistanceUnit";
 
 // Define animations
 const fadeIn = keyframes`
@@ -46,6 +49,7 @@ const fadeIn = keyframes`
 `;
 
 const MyRoutes = () => {
+  const { formatDistance } = useDistanceUnit();
   const navigate = useNavigate();
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
@@ -54,6 +58,9 @@ const MyRoutes = () => {
     "linear(to-r, teal.500, blue.500)",
     "linear(to-r, teal.200, blue.200)"
   );
+  const pageBg = useColorModeValue("gray.50", "gray.900");
+  const statBoxBg = useColorModeValue("gray.50", "gray.700");
+
   const [searchQuery, setSearchQuery] = useState("");
   const [routes, setRoutes] = useState<Route[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,143 +85,8 @@ const MyRoutes = () => {
     loadRoutes();
   }, []);
 
-  // Mock data with coordinates for the route preview (keeping for backwards compatibility)
-  const mockRoutes = [
-    {
-      id: 1,
-      name: "Morning Run",
-      distance: 5.2,
-      location: "Central Park, New York",
-      date: "2024-03-20",
-      difficulty: "Moderate",
-      coordinates: [
-        [-73.968, 40.785],
-        [-73.967, 40.783],
-        [-73.963, 40.782],
-      ],
-    },
-    {
-      id: 2,
-      name: "Park Loop",
-      distance: 3.8,
-      location: "Battery Park, New York",
-      date: "2024-03-19",
-      difficulty: "Easy",
-      coordinates: [
-        [-74.017, 40.703],
-        [-74.015, 40.704],
-        [-74.013, 40.702],
-      ],
-    },
-    {
-      id: 3,
-      name: "City Trail",
-      distance: 7.5,
-      location: "Brooklyn Bridge Park",
-      date: "2024-03-18",
-      difficulty: "Hard",
-      coordinates: [
-        [-73.995, 40.702],
-        [-73.993, 40.703],
-        [-73.991, 40.704],
-      ],
-    },
-    {
-      id: 4,
-      name: "Riverside Run",
-      distance: 6.2,
-      location: "Hudson River Park",
-      date: "2024-03-17",
-      difficulty: "Moderate",
-      coordinates: [
-        [-74.009, 40.733],
-        [-74.008, 40.735],
-        [-74.007, 40.737],
-      ],
-    },
-    {
-      id: 5,
-      name: "Harbor Circuit",
-      distance: 4.5,
-      location: "South Street Seaport",
-      date: "2024-03-16",
-      difficulty: "Easy",
-      coordinates: [
-        [-74.003, 40.706],
-        [-74.002, 40.704],
-        [-74.0, 40.703],
-      ],
-    },
-    {
-      id: 6,
-      name: "Sonoran Desert Loop",
-      distance: 10.5,
-      location: "Anthem, Arizona",
-      date: "2024-03-15",
-      difficulty: "Moderate",
-      coordinates: [
-        [-112.142, 33.868],
-        [-112.138, 33.867],
-        [-112.135, 33.869],
-        [-112.137, 33.871],
-      ],
-    },
-    {
-      id: 7,
-      name: "Queens Botanical Loop",
-      distance: 3.2,
-      location: "Flushing Meadows, NY",
-      date: "2024-03-14",
-      difficulty: "Easy",
-      coordinates: [
-        [-73.834, 40.741],
-        [-73.832, 40.742],
-        [-73.83, 40.74],
-      ],
-    },
-    {
-      id: 8,
-      name: "High Line Express",
-      distance: 8.4,
-      location: "Chelsea, New York",
-      date: "2024-03-13",
-      difficulty: "Hard",
-      coordinates: [
-        [-74.005, 40.747],
-        [-74.004, 40.749],
-        [-74.002, 40.748],
-      ],
-    },
-    {
-      id: 9,
-      name: "Roosevelt Island Circuit",
-      distance: 5.7,
-      location: "Roosevelt Island, NY",
-      date: "2024-03-12",
-      difficulty: "Moderate",
-      coordinates: [
-        [-73.944, 40.759],
-        [-73.943, 40.761],
-        [-73.942, 40.76],
-      ],
-    },
-    {
-      id: 10,
-      name: "Prospect Park Sprint",
-      distance: 4.8,
-      location: "Brooklyn, NY",
-      date: "2024-03-11",
-      difficulty: "Easy",
-      coordinates: [
-        [-73.969, 40.661],
-        [-73.967, 40.662],
-        [-73.965, 40.66],
-      ],
-    },
-  ];
-
-  // Use real routes if available, otherwise use mock data
-  const displayRoutes = routes.length > 0 ? routes : mockRoutes;
+  // Use only real routes from the database
+  const displayRoutes = routes;
 
   // Filter routes based on search query
   const filteredRoutes = useMemo(() => {
@@ -259,16 +131,15 @@ const MyRoutes = () => {
   };
 
   const getMapPreviewUrl = (coordinates: number[][]) => {
-    const lngs = coordinates.map((coord) => coord[0]);
-    const lats = coordinates.map((coord) => coord[1]);
-    const centerLng = (Math.min(...lngs) + Math.max(...lngs)) / 2;
-    const centerLat = (Math.min(...lats) + Math.max(...lats)) / 2;
+    // Add green marker for start position
+    const startMarker = `pin-s+38A169(${coordinates[0][0]},${coordinates[0][1]})`;
 
     const geoJson = {
       type: "Feature",
       properties: {
-        stroke: "#FF3333",
+        stroke: "#3182CE",
         "stroke-width": 3,
+        "stroke-opacity": 0.8,
       },
       geometry: {
         type: "LineString",
@@ -277,14 +148,15 @@ const MyRoutes = () => {
     };
 
     const encodedJson = encodeURIComponent(JSON.stringify(geoJson));
-    return `https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/geojson(${encodedJson})/${centerLng},${centerLat},13/300x200?access_token=${
+    // Use 'auto' to automatically fit the route bounds with padding
+    return `https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/${startMarker},geojson(${encodedJson})/auto/300x200?access_token=${
       import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
-    }`;
+    }&padding=40`;
   };
 
   return (
     <Box
-      bg={useColorModeValue("gray.50", "gray.900")}
+      bg={pageBg}
       minH="calc(100vh - 60px)"
       display="flex"
       flexDirection="column"
@@ -424,6 +296,44 @@ const MyRoutes = () => {
               <RouteCardSkeleton key={index} />
             ))}
           </SimpleGrid>
+        ) : filteredRoutes.length === 0 ? (
+          <Box
+            textAlign="center"
+            py={20}
+            px={6}
+            animation={`${fadeIn} 0.5s ease-out`}
+          >
+            <Icon
+              as={FaRunning}
+              boxSize={20}
+              color="teal.500"
+              mb={6}
+              opacity={0.6}
+            />
+            <Heading size="lg" mb={4}>
+              {routes.length === 0 ? "No routes yet" : "No routes found"}
+            </Heading>
+            <Text fontSize="lg" color="gray.500" mb={8}>
+              {routes.length === 0
+                ? "Start your running journey by creating your first route!"
+                : "Try adjusting your search to find what you're looking for."}
+            </Text>
+            {routes.length === 0 && (
+              <Button
+                leftIcon={<Icon as={FaPlus} />}
+                colorScheme="teal"
+                size="lg"
+                onClick={() => navigate("/create-route")}
+                _hover={{
+                  transform: "translateY(-2px)",
+                  shadow: "lg",
+                }}
+                transition="all 0.2s"
+              >
+                Create Your First Route
+              </Button>
+            )}
+          </Box>
         ) : (
           <SimpleGrid
             columns={{ base: 1, md: 2, lg: 3 }}
@@ -510,12 +420,7 @@ const MyRoutes = () => {
                     </HStack>
                   </VStack>
 
-                  <Box
-                    w="full"
-                    p={4}
-                    bg={useColorModeValue("gray.50", "gray.700")}
-                    borderRadius="lg"
-                  >
+                  <Box w="full" p={4} bg={statBoxBg} borderRadius="lg">
                     <HStack justify="space-between">
                       <Text color="gray.500">Distance</Text>
                       <Text
@@ -524,7 +429,7 @@ const MyRoutes = () => {
                         bgGradient={gradientBg}
                         bgClip="text"
                       >
-                        {route.distance} km
+                        {formatDistance(route.distance)}
                       </Text>
                     </HStack>
                   </Box>

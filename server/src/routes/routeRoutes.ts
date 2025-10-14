@@ -1,6 +1,7 @@
 import express, { Response } from 'express';
 import Route from '../models/Route';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
+import { getElevationData, getDirections } from '../services/mapboxService';
 
 const router = express.Router();
 
@@ -8,6 +9,10 @@ const router = express.Router();
 router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const routes = await Route.find({ userId: req.user!.id }).sort({ createdAt: -1 });
+    console.log('📍 Fetched', routes.length, 'routes');
+    if (routes.length > 0) {
+      console.log('📊 First route elevation data:', routes[0].elevationData ? 'Present' : 'Missing');
+    }
     res.json(routes);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching routes', error });
@@ -38,6 +43,7 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
       coordinates: coordinates
     };
 
+    // Save route first without elevation data (for speed)
     const newRoute = new Route({
       userId: req.user!.id,
       name,
@@ -47,8 +53,32 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
     });
 
     const savedRoute = await newRoute.save();
+    console.log('Route saved successfully');
+
+    // Fetch elevation data and directions in background (non-blocking)
+    // This won't delay the response to the user
+    Promise.all([
+      getElevationData(coordinates),
+      getDirections(coordinates)
+    ]).then(async ([elevationData, directions]) => {
+      try {
+        if (elevationData || directions.length > 0) {
+          await Route.findByIdAndUpdate(savedRoute._id, {
+            elevationData: elevationData || undefined,
+            directions: directions.length > 0 ? directions : undefined
+          });
+          console.log('Elevation and directions data updated for route:', savedRoute._id);
+        }
+      } catch (error) {
+        console.error('Error updating elevation data:', error);
+      }
+    }).catch(error => {
+      console.error('Error fetching elevation/directions:', error);
+    });
+
     res.status(201).json(savedRoute);
   } catch (error) {
+    console.error('Error creating route:', error);
     res.status(400).json({ message: 'Error creating route', error });
   }
 });

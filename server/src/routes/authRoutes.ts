@@ -105,7 +105,8 @@ router.post(
         user: {
           id: user._id,
           name: user.name,
-          email: user.email
+          email: user.email,
+          preferredUnit: user.preferredUnit || 'km'
         }
       });
     } catch (error) {
@@ -133,6 +134,43 @@ router.get('/me', async (req: Request, res: Response) => {
     }
 
     res.json({ user });
+  } catch (error) {
+    res.status(403).json({ message: 'Invalid or expired token' });
+  }
+});
+
+// Update user preferences
+router.patch('/preferences', async (req: Request, res: Response) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ message: 'Access denied. No token provided.' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: string; email: string };
+    const { preferredUnit } = req.body;
+
+    // Validate preferred unit
+    if (preferredUnit && !['km', 'mi'].includes(preferredUnit)) {
+      return res.status(400).json({ message: 'Invalid unit. Must be "km" or "mi"' });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      decoded.id,
+      { preferredUnit },
+      { new: true }
+    ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      message: 'Preferences updated successfully',
+      user
+    });
   } catch (error) {
     res.status(403).json({ message: 'Invalid or expired token' });
   }

@@ -9,6 +9,18 @@ export interface Route {
   date: string;
   difficulty: "Easy" | "Moderate" | "Hard";
   coordinates: number[][];
+  elevationData?: {
+    elevationGain: number;
+    elevationLoss: number;
+    minElevation: number;
+    maxElevation: number;
+    profile: Array<{ distance: number; elevation: number }>;
+  };
+  directions?: Array<{
+    instruction: string;
+    distance: number;
+    type: string;
+  }>;
   createdAt?: string | number;
 }
 
@@ -41,6 +53,8 @@ export const getRoutes = async (): Promise<Route[]> => {
       date: new Date(route.createdAt).toLocaleDateString(),
       difficulty: route.difficulty,
       coordinates: route.coordinates.coordinates,
+      elevationData: route.elevationData,
+      directions: route.directions,
       createdAt: route.createdAt
     }));
   } catch (error) {
