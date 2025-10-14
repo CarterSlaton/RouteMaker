@@ -241,7 +241,11 @@ const Home = () => {
 
           {/* Features Section */}
           <VStack spacing={8} w="full">
-            <Heading size="xl" textAlign="center">
+            <Heading
+              size="xl"
+              textAlign="center"
+              color={useColorModeValue("gray.800", "white")}
+            >
               Why Runners Love RouteMaker
             </Heading>
             <SimpleGrid

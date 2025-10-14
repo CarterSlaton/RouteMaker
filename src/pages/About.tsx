@@ -58,6 +58,7 @@ const About = () => {
               bgGradient={gradientBg}
               bgClip="text"
               fontSize={{ base: "3xl", md: "4xl", lg: "5xl" }}
+              color={useColorModeValue("gray.800", "white")}
             >
               Built by Runners, For Runners
             </Heading>
@@ -112,7 +113,11 @@ const About = () => {
 
           {/* Why We Built This */}
           <VStack spacing={8} align="stretch">
-            <Heading size="xl" textAlign="center">
+            <Heading
+              size="xl"
+              textAlign="center"
+              color={useColorModeValue("gray.800", "white")}
+            >
               Why RouteMaker Exists
             </Heading>
             <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8}>
@@ -154,7 +159,10 @@ const About = () => {
             <VStack spacing={6} align="start">
               <HStack spacing={3}>
                 <Icon as={FaCode} boxSize={7} color="teal.600" />
-                <Heading size="lg" color="teal.600">
+                <Heading
+                  size="lg"
+                  color={useColorModeValue("teal.600", "teal.300")}
+                >
                   Built With Modern Technology
                 </Heading>
               </HStack>
@@ -177,7 +185,11 @@ const About = () => {
 
           {/* Our Values */}
           <VStack spacing={8}>
-            <Heading size="xl" textAlign="center">
+            <Heading
+              size="xl"
+              textAlign="center"
+              color={useColorModeValue("gray.800", "white")}
+            >
               What Drives Us
             </Heading>
             <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8} w="full">
@@ -206,7 +218,9 @@ const About = () => {
           >
             <VStack spacing={6}>
               <Icon as={FaGithub} boxSize={12} color="teal.500" />
-              <Heading size="lg">Open Source & Community Driven</Heading>
+              <Heading size="lg" color={useColorModeValue("gray.800", "white")}>
+                Open Source & Community Driven
+              </Heading>
               <Text
                 fontSize="lg"
                 color={textColor}
@@ -311,7 +325,9 @@ const PrincipleCard = ({
       <Stack spacing={4}>
         <HStack spacing={3}>
           <Icon as={icon} boxSize={6} color="teal.500" />
-          <Heading size="md">{title}</Heading>
+          <Heading size="md" color={useColorModeValue("gray.800", "white")}>
+            {title}
+          </Heading>
         </HStack>
         <Text
           color={useColorModeValue("gray.600", "gray.300")}

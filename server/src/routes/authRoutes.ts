@@ -53,7 +53,15 @@ router.post(
         user: {
           id: user._id,
           name: user.name,
-          email: user.email
+          email: user.email,
+          preferredUnit: user.preferredUnit || 'km',
+          mapStyle: user.mapStyle || 'streets-v12',
+          defaultZoom: user.defaultZoom || 12,
+          autoSaveRoutes: user.autoSaveRoutes !== undefined ? user.autoSaveRoutes : true,
+          compactView: user.compactView || false,
+          showRoutePreview: user.showRoutePreview !== undefined ? user.showRoutePreview : true,
+          reduceAnimations: user.reduceAnimations || false,
+          fontSize: user.fontSize || 'medium'
         }
       });
     } catch (error) {
@@ -106,7 +114,14 @@ router.post(
           id: user._id,
           name: user.name,
           email: user.email,
-          preferredUnit: user.preferredUnit || 'km'
+          preferredUnit: user.preferredUnit || 'km',
+          mapStyle: user.mapStyle || 'streets-v12',
+          defaultZoom: user.defaultZoom || 12,
+          autoSaveRoutes: user.autoSaveRoutes !== undefined ? user.autoSaveRoutes : true,
+          compactView: user.compactView || false,
+          showRoutePreview: user.showRoutePreview !== undefined ? user.showRoutePreview : true,
+          reduceAnimations: user.reduceAnimations || false,
+          fontSize: user.fontSize || 'medium'
         }
       });
     } catch (error) {
@@ -150,16 +165,56 @@ router.patch('/preferences', async (req: Request, res: Response) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { id: string; email: string };
-    const { preferredUnit } = req.body;
+    const { 
+      preferredUnit, 
+      mapStyle, 
+      defaultZoom, 
+      autoSaveRoutes,
+      compactView,
+      showRoutePreview,
+      reduceAnimations,
+      fontSize
+    } = req.body;
 
-    // Validate preferred unit
-    if (preferredUnit && !['km', 'mi'].includes(preferredUnit)) {
-      return res.status(400).json({ message: 'Invalid unit. Must be "km" or "mi"' });
+    // Build update object with only provided fields
+    const updateFields: any = {};
+    
+    if (preferredUnit !== undefined) {
+      if (!['km', 'mi'].includes(preferredUnit)) {
+        return res.status(400).json({ message: 'Invalid unit. Must be "km" or "mi"' });
+      }
+      updateFields.preferredUnit = preferredUnit;
+    }
+
+    if (mapStyle !== undefined) {
+      if (!['streets-v12', 'satellite-streets-v12', 'outdoors-v12', 'dark-v11'].includes(mapStyle)) {
+        return res.status(400).json({ message: 'Invalid map style' });
+      }
+      updateFields.mapStyle = mapStyle;
+    }
+
+    if (defaultZoom !== undefined) {
+      if (typeof defaultZoom !== 'number' || defaultZoom < 1 || defaultZoom > 20) {
+        return res.status(400).json({ message: 'Default zoom must be between 1 and 20' });
+      }
+      updateFields.defaultZoom = defaultZoom;
+    }
+
+    if (autoSaveRoutes !== undefined) updateFields.autoSaveRoutes = autoSaveRoutes;
+    if (compactView !== undefined) updateFields.compactView = compactView;
+    if (showRoutePreview !== undefined) updateFields.showRoutePreview = showRoutePreview;
+    if (reduceAnimations !== undefined) updateFields.reduceAnimations = reduceAnimations;
+    
+    if (fontSize !== undefined) {
+      if (!['small', 'medium', 'large'].includes(fontSize)) {
+        return res.status(400).json({ message: 'Font size must be "small", "medium", or "large"' });
+      }
+      updateFields.fontSize = fontSize;
     }
 
     const user = await User.findByIdAndUpdate(
       decoded.id,
-      { preferredUnit },
+      updateFields,
       { new: true }
     ).select('-password');
 

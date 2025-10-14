@@ -31,6 +31,7 @@ import { saveRoute } from "../utils/routeStorage";
 import { useNavigate } from "react-router-dom";
 import { useDistanceUnit } from "../utils/useDistanceUnit";
 import { milesToKm } from "../utils/unitConversion";
+import { useAuth } from "../contexts/AuthContext";
 
 // Initialize Mapbox access token
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || "";
@@ -57,6 +58,8 @@ const CreateRoute = () => {
   const toast = useToast();
   const navigate = useNavigate();
   const { preferredUnit, formatDistance } = useDistanceUnit();
+  const { user } = useAuth();
+  const reduceAnimations = user?.reduceAnimations ?? false;
 
   const headerBg = useColorModeValue("white", "gray.800");
   const cardBg = useColorModeValue("white", "gray.800");
@@ -135,11 +138,15 @@ const CreateRoute = () => {
     }
 
     try {
+      // Use user's preferred map style or default to dark-v11
+      const mapStyle = user?.mapStyle || "dark-v11";
+      const defaultZoom = user?.defaultZoom || 9;
+
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: "mapbox://styles/mapbox/dark-v11",
+        style: `mapbox://styles/mapbox/${mapStyle}`,
         center: [-74.5, 40], // Default center (adjust as needed)
-        zoom: 9,
+        zoom: defaultZoom,
       });
 
       draw.current = new MapboxDraw({
@@ -247,6 +254,68 @@ const CreateRoute = () => {
     };
   }, [toast]);
 
+  // Auto-save draft functionality
+  useEffect(() => {
+    if (!user?.autoSaveRoutes || distance === 0) return;
+
+    const autoSaveInterval = setInterval(() => {
+      const data = draw.current?.getAll();
+      if (data && data.features.length > 0) {
+        // Save draft to localStorage
+        const draft = {
+          distance,
+          difficulty,
+          location,
+          coordinates: data.features[0].geometry.coordinates,
+          lastSaved: new Date().toISOString(),
+        };
+        localStorage.setItem("routeDraft", JSON.stringify(draft));
+
+        toast({
+          title: "Draft auto-saved",
+          status: "info",
+          duration: 2000,
+          isClosable: true,
+          position: "bottom-right",
+        });
+      }
+    }, 30000); // Auto-save every 30 seconds
+
+    return () => clearInterval(autoSaveInterval);
+  }, [user?.autoSaveRoutes, distance, difficulty, location, toast]);
+
+  // Load draft on mount if auto-save is enabled
+  useEffect(() => {
+    if (!user?.autoSaveRoutes) return;
+
+    const savedDraft = localStorage.getItem("routeDraft");
+    if (savedDraft) {
+      try {
+        const draft = JSON.parse(savedDraft);
+        const lastSaved = new Date(draft.lastSaved);
+        const hoursSinceLastSave =
+          (Date.now() - lastSaved.getTime()) / (1000 * 60 * 60);
+
+        // Only restore if saved within last 24 hours
+        if (hoursSinceLastSave < 24 && draft.coordinates) {
+          toast({
+            title: "Draft found",
+            description: "Would you like to restore your last route draft?",
+            status: "info",
+            duration: 10000,
+            isClosable: true,
+            position: "top",
+          });
+
+          // You could add a restore button here in a future enhancement
+          // For now, just notify the user
+        }
+      } catch (error) {
+        console.error("Error loading draft:", error);
+      }
+    }
+  }, [user?.autoSaveRoutes, toast]);
+
   const handleSaveRoute = () => {
     const data = draw.current.getAll();
     if (data.features.length === 0) {
@@ -314,6 +383,9 @@ const CreateRoute = () => {
       draw.current.deleteAll();
       setDistance(0);
       onClose();
+
+      // Clear auto-save draft
+      localStorage.removeItem("routeDraft");
 
       // Navigate to My Routes after a short delay
       setTimeout(() => {
@@ -564,7 +636,7 @@ const CreateRoute = () => {
                 <Heading size="xl" bgGradient={gradientBg} bgClip="text">
                   Create New Route
                 </Heading>
-                <Text color="gray.500">
+                <Text color={useColorModeValue("gray.500", "gray.400")}>
                   Draw your route on the map or auto-generate a loop
                 </Text>
               </VStack>
@@ -578,10 +650,10 @@ const CreateRoute = () => {
                   loadingText="Generating..."
                   size="md"
                   _hover={{
-                    transform: "translateY(-2px)",
+                    transform: reduceAnimations ? "none" : "translateY(-2px)",
                     shadow: "md",
                   }}
-                  transition="all 0.2s"
+                  transition={reduceAnimations ? "none" : "all 0.2s"}
                 >
                   Auto-Generate
                 </Button>
@@ -629,13 +701,25 @@ const CreateRoute = () => {
           <HStack spacing={6}>
             <HStack>
               <Icon as={FaRuler} color="teal.500" />
-              <Text fontSize="lg">Distance: {formatDistance(distance)}</Text>
+              <Text
+                fontSize="lg"
+                color={useColorModeValue("gray.800", "white")}
+              >
+                Distance: {formatDistance(distance)}
+              </Text>
             </HStack>
             <HStack>
               <Icon as={FaRoute} color="teal.500" />
-              <Text fontSize="lg">
+              <Text
+                fontSize="lg"
+                color={useColorModeValue("gray.800", "white")}
+              >
                 Difficulty: {difficulty}{" "}
-                <Text as="span" fontSize="sm" color="gray.500">
+                <Text
+                  as="span"
+                  fontSize="sm"
+                  color={useColorModeValue("gray.500", "gray.400")}
+                >
                   (auto)
                 </Text>
               </Text>
@@ -647,10 +731,10 @@ const CreateRoute = () => {
             onClick={handleSaveRoute}
             size="lg"
             _hover={{
-              transform: "translateY(-2px)",
+              transform: reduceAnimations ? "none" : "translateY(-2px)",
               shadow: "lg",
             }}
-            transition="all 0.2s"
+            transition={reduceAnimations ? "none" : "all 0.2s"}
           >
             Save Route
           </Button>
@@ -661,19 +745,26 @@ const CreateRoute = () => {
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay backdropFilter="blur(4px)" />
         <ModalContent>
-          <ModalHeader bgGradient={gradientBg} bgClip="text">
+          <ModalHeader
+            bgGradient={gradientBg}
+            bgClip="text"
+            color={useColorModeValue("gray.800", "white")}
+          >
             Save Your Route
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
             <VStack spacing={4}>
               <FormControl isRequired>
-                <FormLabel>Route Name</FormLabel>
+                <FormLabel color={useColorModeValue("gray.700", "gray.200")}>
+                  Route Name
+                </FormLabel>
                 <Input
                   placeholder="e.g., Morning Park Run"
                   value={routeName}
                   onChange={(e) => setRouteName(e.target.value)}
                   autoFocus
+                  color={useColorModeValue("gray.800", "white")}
                   onKeyPress={(e) => {
                     if (e.key === "Enter") {
                       confirmSaveRoute();
@@ -683,11 +774,14 @@ const CreateRoute = () => {
               </FormControl>
 
               <FormControl>
-                <FormLabel>Location</FormLabel>
+                <FormLabel color={useColorModeValue("gray.700", "gray.200")}>
+                  Location
+                </FormLabel>
                 <Input
                   placeholder="Location"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
+                  color={useColorModeValue("gray.800", "white")}
                 />
               </FormControl>
 
@@ -699,11 +793,20 @@ const CreateRoute = () => {
               >
                 <VStack spacing={2} align="stretch">
                   <HStack justify="space-between">
-                    <Text color="gray.500">Distance:</Text>
-                    <Text fontWeight="bold">{formatDistance(distance)}</Text>
+                    <Text color={useColorModeValue("gray.500", "gray.400")}>
+                      Distance:
+                    </Text>
+                    <Text
+                      fontWeight="bold"
+                      color={useColorModeValue("gray.800", "white")}
+                    >
+                      {formatDistance(distance)}
+                    </Text>
                   </HStack>
                   <HStack justify="space-between">
-                    <Text color="gray.500">Difficulty:</Text>
+                    <Text color={useColorModeValue("gray.500", "gray.400")}>
+                      Difficulty:
+                    </Text>
                     <Badge colorScheme={getDifficultyColor(difficulty)}>
                       {difficulty}
                     </Badge>
@@ -732,14 +835,20 @@ const CreateRoute = () => {
       <Modal isOpen={isGenerateOpen} onClose={onGenerateClose} isCentered>
         <ModalOverlay backdropFilter="blur(4px)" />
         <ModalContent>
-          <ModalHeader bgGradient={gradientBg} bgClip="text">
+          <ModalHeader
+            bgGradient={gradientBg}
+            bgClip="text"
+            color={useColorModeValue("gray.800", "white")}
+          >
             Auto-Generate Loop Route
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
             <VStack spacing={4}>
               <FormControl isRequired>
-                <FormLabel>Target Distance ({preferredUnit})</FormLabel>
+                <FormLabel color={useColorModeValue("gray.700", "gray.200")}>
+                  Target Distance ({preferredUnit})
+                </FormLabel>
                 <Input
                   type="number"
                   step="0.1"
@@ -751,6 +860,7 @@ const CreateRoute = () => {
                   value={targetDistance}
                   onChange={(e) => setTargetDistance(e.target.value)}
                   autoFocus
+                  color={useColorModeValue("gray.800", "white")}
                   onKeyPress={(e) => {
                     if (e.key === "Enter") {
                       generateAutoRoute();
@@ -766,17 +876,29 @@ const CreateRoute = () => {
                 borderRadius="lg"
               >
                 <VStack spacing={2} align="start">
-                  <Text fontSize="sm" color="gray.500">
+                  <Text
+                    fontSize="sm"
+                    color={useColorModeValue("gray.500", "gray.400")}
+                  >
                     ℹ️ This will generate a loop route that starts and ends at
                     your current location.
                   </Text>
-                  <Text fontSize="sm" color="gray.500">
+                  <Text
+                    fontSize="sm"
+                    color={useColorModeValue("gray.500", "gray.400")}
+                  >
                     • Target accuracy: Within 7%
                   </Text>
-                  <Text fontSize="sm" color="gray.500">
+                  <Text
+                    fontSize="sm"
+                    color={useColorModeValue("gray.500", "gray.400")}
+                  >
                     • Smart retry: Up to 3 attempts
                   </Text>
-                  <Text fontSize="sm" color="gray.500">
+                  <Text
+                    fontSize="sm"
+                    color={useColorModeValue("gray.500", "gray.400")}
+                  >
                     • Uses walking paths and roads
                   </Text>
                   <Text fontSize="sm" color="gray.500">

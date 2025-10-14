@@ -41,6 +41,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { getRoutes, deleteRoute, type Route } from "../utils/routeStorage";
 import RouteCardSkeleton from "../components/RouteCardSkeleton";
 import { useDistanceUnit } from "../utils/useDistanceUnit";
+import { useAuth } from "../contexts/AuthContext";
 
 // Define animations
 const fadeIn = keyframes`
@@ -51,6 +52,7 @@ const fadeIn = keyframes`
 const MyRoutes = () => {
   const { formatDistance } = useDistanceUnit();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const headerBg = useColorModeValue("white", "gray.800");
@@ -60,6 +62,11 @@ const MyRoutes = () => {
   );
   const pageBg = useColorModeValue("gray.50", "gray.900");
   const statBoxBg = useColorModeValue("gray.50", "gray.700");
+
+  // Get user preferences
+  const isCompactView = user?.compactView ?? false;
+  const showPreview = user?.showRoutePreview ?? true;
+  const reduceAnimations = user?.reduceAnimations ?? false;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [routes, setRoutes] = useState<Route[]>([]);
@@ -213,6 +220,7 @@ const MyRoutes = () => {
                 bg={cardBg}
                 border="1px"
                 borderColor={borderColor}
+                color={useColorModeValue("gray.800", "white")}
                 _hover={{
                   borderColor: "teal.300",
                 }}
@@ -310,10 +318,18 @@ const MyRoutes = () => {
               mb={6}
               opacity={0.6}
             />
-            <Heading size="lg" mb={4}>
+            <Heading
+              size="lg"
+              mb={4}
+              color={useColorModeValue("gray.800", "white")}
+            >
               {routes.length === 0 ? "No routes yet" : "No routes found"}
             </Heading>
-            <Text fontSize="lg" color="gray.500" mb={8}>
+            <Text
+              fontSize="lg"
+              color={useColorModeValue("gray.500", "gray.400")}
+              mb={8}
+            >
               {routes.length === 0
                 ? "Start your running journey by creating your first route!"
                 : "Try adjusting your search to find what you're looking for."}
@@ -334,11 +350,120 @@ const MyRoutes = () => {
               </Button>
             )}
           </Box>
+        ) : isCompactView ? (
+          // Compact list view
+          <VStack
+            spacing={4}
+            animation={reduceAnimations ? "none" : `${fadeIn} 0.5s ease-out`}
+          >
+            {filteredRoutes.map((route, index) => (
+              <Flex
+                key={route.id}
+                bg={cardBg}
+                border="1px"
+                borderColor={borderColor}
+                borderRadius="lg"
+                p={4}
+                w="full"
+                align="center"
+                gap={4}
+                cursor="pointer"
+                _hover={{
+                  shadow: "lg",
+                  transform: reduceAnimations ? "none" : "translateX(4px)",
+                }}
+                transition={reduceAnimations ? "none" : "all 0.2s"}
+                onClick={() =>
+                  navigate(`/route/${"_id" in route ? route._id : route.id}`)
+                }
+                style={{
+                  animationDelay: reduceAnimations ? "0s" : `${index * 0.05}s`,
+                }}
+              >
+                {/* Compact preview (only if showPreview is true) */}
+                {showPreview && (
+                  <Image
+                    src={getMapPreviewUrl(route.coordinates)}
+                    alt={`Preview of ${route.name}`}
+                    width="120px"
+                    height="80px"
+                    objectFit="cover"
+                    borderRadius="md"
+                    flexShrink={0}
+                    fallbackSrc="https://via.placeholder.com/120x80?text=Map"
+                  />
+                )}
+
+                {/* Route info */}
+                <Flex flex="1" align="center" justify="space-between" gap={4}>
+                  <VStack align="start" spacing={1} flex="1">
+                    <Heading
+                      size="sm"
+                      noOfLines={1}
+                      color={useColorModeValue("gray.800", "white")}
+                    >
+                      {route.name}
+                    </Heading>
+                    <HStack
+                      color={useColorModeValue("gray.500", "gray.400")}
+                      fontSize="xs"
+                      spacing={3}
+                      flexWrap="wrap"
+                    >
+                      <HStack>
+                        <Icon as={FaMapMarkerAlt} />
+                        <Text noOfLines={1}>{route.location}</Text>
+                      </HStack>
+                      <HStack>
+                        <Icon as={FaCalendarAlt} />
+                        <Text>{new Date(route.date).toLocaleDateString()}</Text>
+                      </HStack>
+                    </HStack>
+                  </VStack>
+
+                  {/* Stats */}
+                  <HStack spacing={4} flexShrink={0}>
+                    <Badge
+                      colorScheme={getDifficultyColor(route.difficulty)}
+                      borderRadius="full"
+                      px={3}
+                      py={1}
+                      textTransform="capitalize"
+                    >
+                      {route.difficulty}
+                    </Badge>
+                    <Text
+                      fontWeight="bold"
+                      fontSize="lg"
+                      bgGradient={gradientBg}
+                      bgClip="text"
+                      minW="80px"
+                      textAlign="right"
+                    >
+                      {formatDistance(route.distance)}
+                    </Text>
+                    <IconButton
+                      aria-label="Delete route"
+                      icon={<Icon as={FaTrash} />}
+                      colorScheme="red"
+                      size="sm"
+                      onClick={(e) => handleDeleteClick(String(route.id), e)}
+                      _hover={{
+                        transform: "scale(1.1)",
+                      }}
+                      transition="all 0.2s"
+                    />
+                  </HStack>
+                </Flex>
+              </Flex>
+            ))}
+          </VStack>
         ) : (
+          // Grid card view
           <SimpleGrid
             columns={{ base: 1, md: 2, lg: 3 }}
             spacing={{ base: 6, md: 8 }}
-            animation={`${fadeIn} 0.5s ease-out`}
+            animation={reduceAnimations ? "none" : `${fadeIn} 0.5s ease-out`}
           >
             {filteredRoutes.map((route, index) => (
               <Box
@@ -350,65 +475,114 @@ const MyRoutes = () => {
                 borderColor={borderColor}
                 position="relative"
                 _hover={{
-                  transform: "translateY(-8px) scale(1.02)",
+                  transform: reduceAnimations
+                    ? "none"
+                    : "translateY(-8px) scale(1.02)",
                   shadow: "2xl",
                 }}
-                transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                transition={
+                  reduceAnimations
+                    ? "none"
+                    : "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                }
                 cursor="pointer"
                 onClick={() =>
                   navigate(`/route/${"_id" in route ? route._id : route.id}`)
                 }
                 style={{
-                  animationDelay: `${index * 0.1}s`,
+                  animationDelay: reduceAnimations ? "0s" : `${index * 0.1}s`,
                 }}
               >
-                {/* Delete button */}
-                <IconButton
-                  aria-label="Delete route"
-                  icon={<Icon as={FaTrash} />}
-                  position="absolute"
-                  top={4}
-                  left={4}
-                  colorScheme="red"
-                  size="sm"
-                  zIndex={2}
-                  onClick={(e) => handleDeleteClick(String(route.id), e)}
-                  _hover={{
-                    transform: "scale(1.1)",
-                  }}
-                  transition="all 0.2s"
-                />
-                <Box position="relative">
-                  <Image
-                    src={getMapPreviewUrl(route.coordinates)}
-                    alt={`Preview of ${route.name}`}
-                    width="100%"
-                    height="200px"
-                    objectFit="cover"
-                    loading="lazy"
-                    fallbackSrc="https://via.placeholder.com/300x200?text=Map+Preview"
-                  />
-                  <Badge
-                    position="absolute"
-                    top={4}
-                    right={4}
-                    colorScheme={getDifficultyColor(route.difficulty)}
-                    borderRadius="full"
-                    px={3}
-                    py={1}
-                    textTransform="capitalize"
-                    boxShadow="md"
-                  >
-                    {route.difficulty}
-                  </Badge>
-                </Box>
+                {/* Conditionally show map preview based on showPreview preference */}
+                {showPreview && (
+                  <Box position="relative">
+                    {/* Delete button on map */}
+                    <IconButton
+                      aria-label="Delete route"
+                      icon={<Icon as={FaTrash} />}
+                      position="absolute"
+                      top={4}
+                      left={4}
+                      colorScheme="red"
+                      size="sm"
+                      zIndex={2}
+                      onClick={(e) => handleDeleteClick(String(route.id), e)}
+                      _hover={{
+                        transform: "scale(1.1)",
+                      }}
+                      transition="all 0.2s"
+                    />
+                    <Image
+                      src={getMapPreviewUrl(route.coordinates)}
+                      alt={`Preview of ${route.name}`}
+                      width="100%"
+                      height="200px"
+                      objectFit="cover"
+                      loading="lazy"
+                      fallbackSrc="https://via.placeholder.com/300x200?text=Map+Preview"
+                    />
+                    <Badge
+                      position="absolute"
+                      top={4}
+                      right={4}
+                      colorScheme={getDifficultyColor(route.difficulty)}
+                      borderRadius="full"
+                      px={3}
+                      py={1}
+                      textTransform="capitalize"
+                      boxShadow="md"
+                    >
+                      {route.difficulty}
+                    </Badge>
+                  </Box>
+                )}
 
-                <VStack spacing={4} p={6}>
+                <VStack spacing={4} p={6} position="relative">
                   <VStack align="start" spacing={2} w="full">
-                    <Heading size="md" noOfLines={1}>
-                      {route.name}
-                    </Heading>
-                    <HStack color="gray.500" fontSize="sm" spacing={4}>
+                    <HStack justify="space-between" w="full" align="start">
+                      <Heading
+                        size="md"
+                        noOfLines={1}
+                        color={useColorModeValue("gray.800", "white")}
+                        flex="1"
+                        pr={2}
+                      >
+                        {route.name}
+                      </Heading>
+                      <HStack spacing={2} flexShrink={0}>
+                        {!showPreview && (
+                          <>
+                            <Badge
+                              colorScheme={getDifficultyColor(route.difficulty)}
+                              borderRadius="full"
+                              px={3}
+                              py={1}
+                              textTransform="capitalize"
+                            >
+                              {route.difficulty}
+                            </Badge>
+                            <IconButton
+                              aria-label="Delete route"
+                              icon={<Icon as={FaTrash} />}
+                              colorScheme="red"
+                              size="sm"
+                              onClick={(e) =>
+                                handleDeleteClick(String(route.id), e)
+                              }
+                              _hover={{
+                                transform: "scale(1.1)",
+                              }}
+                              transition="all 0.2s"
+                            />
+                          </>
+                        )}
+                      </HStack>
+                    </HStack>
+                    <HStack
+                      color={useColorModeValue("gray.500", "gray.400")}
+                      fontSize="sm"
+                      spacing={4}
+                    >
                       <HStack>
                         <Icon as={FaMapMarkerAlt} />
                         <Text noOfLines={1}>{route.location}</Text>
@@ -422,7 +596,9 @@ const MyRoutes = () => {
 
                   <Box w="full" p={4} bg={statBoxBg} borderRadius="lg">
                     <HStack justify="space-between">
-                      <Text color="gray.500">Distance</Text>
+                      <Text color={useColorModeValue("gray.500", "gray.400")}>
+                        Distance
+                      </Text>
                       <Text
                         fontWeight="bold"
                         fontSize="lg"
