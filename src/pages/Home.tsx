@@ -314,42 +314,45 @@ const Home = () => {
             borderColor={borderColor}
           >
             <VStack spacing={6} align="start">
-              <Heading size="lg" color="teal.600">
+              <Heading
+                size="lg"
+                color={useColorModeValue("teal.600", "teal.300")}
+              >
                 What You Get With RouteMaker
               </Heading>
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
                 <List spacing={3}>
-                  <ListItem>
+                  <ListItem color={useColorModeValue("gray.700", "gray.300")}>
                     <ListIcon as={FaCheck} color="teal.500" />
                     Unlimited route creation
                   </ListItem>
-                  <ListItem>
+                  <ListItem color={useColorModeValue("gray.700", "gray.300")}>
                     <ListIcon as={FaCheck} color="teal.500" />
                     Save routes to your personal library
                   </ListItem>
-                  <ListItem>
+                  <ListItem color={useColorModeValue("gray.700", "gray.300")}>
                     <ListIcon as={FaCheck} color="teal.500" />
                     Real-time distance tracking
                   </ListItem>
-                  <ListItem>
+                  <ListItem color={useColorModeValue("gray.700", "gray.300")}>
                     <ListIcon as={FaCheck} color="teal.500" />
                     Interactive map with multiple views
                   </ListItem>
                 </List>
                 <List spacing={3}>
-                  <ListItem>
+                  <ListItem color={useColorModeValue("gray.700", "gray.300")}>
                     <ListIcon as={FaCheck} color="teal.500" />
                     Mobile-friendly design
                   </ListItem>
-                  <ListItem>
+                  <ListItem color={useColorModeValue("gray.700", "gray.300")}>
                     <ListIcon as={FaCheck} color="teal.500" />
                     Secure cloud storage
                   </ListItem>
-                  <ListItem>
+                  <ListItem color={useColorModeValue("gray.700", "gray.300")}>
                     <ListIcon as={FaCheck} color="teal.500" />
                     Easy route management
                   </ListItem>
-                  <ListItem>
+                  <ListItem color={useColorModeValue("gray.700", "gray.300")}>
                     <ListIcon as={FaCheck} color="teal.500" />
                     100% free, no ads
                   </ListItem>

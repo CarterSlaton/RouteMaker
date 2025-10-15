@@ -1,4 +1,10 @@
-import { ChakraProvider, Box, Spinner, Center } from "@chakra-ui/react";
+import {
+  ChakraProvider,
+  Box,
+  Spinner,
+  Center,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -67,73 +73,88 @@ const FontSizeWrapper = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// App content wrapper to use color mode
+const AppContent = () => {
+  const appBg = useColorModeValue("gray.50", "gray.900");
+
+  return (
+    <Router>
+      <Box
+        minH="100vh"
+        w="100%"
+        display="flex"
+        flexDirection="column"
+        bg={appBg}
+      >
+        <Navbar />
+        <FontSizeWrapper>
+          <Box as="main" flex="1" w="100%" p={4} overflowY="auto">
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <Home />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/create"
+                  element={
+                    <ProtectedRoute>
+                      <CreateRoute />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/my-routes"
+                  element={
+                    <ProtectedRoute>
+                      <MyRoutes />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/route/:id"
+                  element={
+                    <ProtectedRoute>
+                      <RouteDetails />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/about"
+                  element={
+                    <ProtectedRoute>
+                      <About />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute>
+                      <Settings />
+                    </ProtectedRoute>
+                  }
+                />
+              </Routes>
+            </Suspense>
+          </Box>
+        </FontSizeWrapper>
+      </Box>
+    </Router>
+  );
+};
+
 function App() {
   return (
     <ChakraProvider theme={theme}>
       <AuthProvider>
-        <Router>
-          <Box minH="100vh" w="100%" display="flex" flexDirection="column">
-            <Navbar />
-            <FontSizeWrapper>
-              <Box as="main" flex="1" w="100%" p={4} overflowY="auto">
-                <Suspense fallback={<PageLoader />}>
-                  <Routes>
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route
-                      path="/"
-                      element={
-                        <ProtectedRoute>
-                          <Home />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/create"
-                      element={
-                        <ProtectedRoute>
-                          <CreateRoute />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/my-routes"
-                      element={
-                        <ProtectedRoute>
-                          <MyRoutes />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/route/:id"
-                      element={
-                        <ProtectedRoute>
-                          <RouteDetails />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/about"
-                      element={
-                        <ProtectedRoute>
-                          <About />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/settings"
-                      element={
-                        <ProtectedRoute>
-                          <Settings />
-                        </ProtectedRoute>
-                      }
-                    />
-                  </Routes>
-                </Suspense>
-              </Box>
-            </FontSizeWrapper>
-          </Box>
-        </Router>
+        <AppContent />
       </AuthProvider>
     </ChakraProvider>
   );
