@@ -121,6 +121,7 @@ const Register = () => {
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const subtitleColor = useColorModeValue("gray.600", "gray.400");
   const labelColor = useColorModeValue("gray.700", "gray.200");
+  const inputTextColor = useColorModeValue("gray.900", "gray.100");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -284,6 +285,7 @@ const Register = () => {
                   onBlur={() => handleBlur("name")}
                   placeholder="John Doe"
                   size="lg"
+                  color={inputTextColor}
                 />
                 {touched.name && errors.name && (
                   <FormErrorMessage>{errors.name}</FormErrorMessage>
@@ -307,6 +309,7 @@ const Register = () => {
                   onBlur={() => handleBlur("email")}
                   placeholder="your.email@example.com"
                   size="lg"
+                  color={inputTextColor}
                 />
                 {touched.email && errors.email && (
                   <FormErrorMessage>{errors.email}</FormErrorMessage>
@@ -328,6 +331,7 @@ const Register = () => {
                     onChange={handlePasswordChange}
                     onBlur={() => handleBlur("password")}
                     placeholder="••••••••"
+                    color={inputTextColor}
                   />
                   <InputRightElement>
                     <IconButton
@@ -377,6 +381,7 @@ const Register = () => {
                     onChange={handleConfirmPasswordChange}
                     onBlur={() => handleBlur("confirmPassword")}
                     placeholder="••••••••"
+                    color={inputTextColor}
                   />
                   <InputRightElement>
                     <IconButton

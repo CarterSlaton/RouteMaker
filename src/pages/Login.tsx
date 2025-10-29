@@ -49,6 +49,7 @@ const Login = () => {
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const subtitleColor = useColorModeValue("gray.600", "gray.400");
   const labelColor = useColorModeValue("gray.700", "gray.200");
+  const inputTextColor = useColorModeValue("gray.900", "gray.100");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,6 +145,7 @@ const Login = () => {
                   onBlur={handleEmailBlur}
                   placeholder="your.email@example.com"
                   size="lg"
+                  color={inputTextColor}
                 />
                 {touched.email && emailError && (
                   <FormErrorMessage>{emailError}</FormErrorMessage>
@@ -163,6 +165,7 @@ const Login = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
+                    color={inputTextColor}
                   />
                   <InputRightElement>
                     <IconButton
