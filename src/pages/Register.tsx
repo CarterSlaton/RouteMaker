@@ -119,6 +119,8 @@ const Register = () => {
 
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
+  const subtitleColor = useColorModeValue("gray.600", "gray.400");
+  const labelColor = useColorModeValue("gray.700", "gray.200");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -267,14 +269,14 @@ const Register = () => {
           >
             Create Account
           </Heading>
-          <Text textAlign="center" color="gray.600">
+          <Text textAlign="center" color={subtitleColor}>
             Join RouteMaker today
           </Text>
 
           <form onSubmit={handleSubmit}>
             <Stack spacing={4}>
               <FormControl isRequired isInvalid={touched.name && !!errors.name}>
-                <FormLabel>Name</FormLabel>
+                <FormLabel color={labelColor}>Name</FormLabel>
                 <Input
                   type="text"
                   value={name}
@@ -297,7 +299,7 @@ const Register = () => {
                 isRequired
                 isInvalid={touched.email && !!errors.email}
               >
-                <FormLabel>Email</FormLabel>
+                <FormLabel color={labelColor}>Email</FormLabel>
                 <Input
                   type="email"
                   value={email}
@@ -318,7 +320,7 @@ const Register = () => {
                 isRequired
                 isInvalid={touched.password && !!errors.password}
               >
-                <FormLabel>Password</FormLabel>
+                <FormLabel color={labelColor}>Password</FormLabel>
                 <InputGroup size="lg">
                   <Input
                     type={showPassword ? "text" : "password"}
@@ -367,7 +369,7 @@ const Register = () => {
                 isRequired
                 isInvalid={touched.confirmPassword && !!errors.confirmPassword}
               >
-                <FormLabel>Confirm Password</FormLabel>
+                <FormLabel color={labelColor}>Confirm Password</FormLabel>
                 <InputGroup size="lg">
                   <Input
                     type={showConfirmPassword ? "text" : "password"}
@@ -421,7 +423,7 @@ const Register = () => {
             </Stack>
           </form>
 
-          <Text textAlign="center" fontSize="sm">
+          <Text textAlign="center" fontSize="sm" color={subtitleColor}>
             Already have an account?{" "}
             <ChakraLink
               as={RouterLink}

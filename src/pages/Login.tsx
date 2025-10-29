@@ -47,6 +47,8 @@ const Login = () => {
 
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
+  const subtitleColor = useColorModeValue("gray.600", "gray.400");
+  const labelColor = useColorModeValue("gray.700", "gray.200");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,14 +129,14 @@ const Login = () => {
           >
             Welcome Back
           </Heading>
-          <Text textAlign="center" color="gray.600">
+          <Text textAlign="center" color={subtitleColor}>
             Sign in to your account
           </Text>
 
           <form onSubmit={handleSubmit}>
             <Stack spacing={4}>
               <FormControl isRequired isInvalid={touched.email && !!emailError}>
-                <FormLabel>Email</FormLabel>
+                <FormLabel color={labelColor}>Email</FormLabel>
                 <Input
                   type="email"
                   value={email}
@@ -154,7 +156,7 @@ const Login = () => {
               </FormControl>
 
               <FormControl isRequired>
-                <FormLabel>Password</FormLabel>
+                <FormLabel color={labelColor}>Password</FormLabel>
                 <InputGroup size="lg">
                   <Input
                     type={showPassword ? "text" : "password"}
@@ -195,7 +197,7 @@ const Login = () => {
             </Stack>
           </form>
 
-          <Text textAlign="center" fontSize="sm">
+          <Text textAlign="center" fontSize="sm" color={subtitleColor}>
             Don't have an account?{" "}
             <ChakraLink
               as={RouterLink}
