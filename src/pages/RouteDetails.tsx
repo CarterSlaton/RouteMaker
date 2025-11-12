@@ -34,6 +34,7 @@ import {
   FaTachometerAlt,
   FaArrowDown,
   FaArrowUp,
+  FaRunning,
 } from "react-icons/fa";
 import { getRoutes, deleteRoute, type Route } from "../utils/routeStorage";
 import RouteMap from "../components/RouteMap";
@@ -60,6 +61,11 @@ const RouteDetails = () => {
   const textColor = useColorModeValue("gray.600", "gray.300");
   const accentBg = useColorModeValue("teal.50", "teal.900");
   const pageBg = useColorModeValue("gray.50", "gray.900");
+  const tealColor = useColorModeValue("teal.600", "teal.300");
+  const labelColor = useColorModeValue("gray.700", "gray.200");
+  const headingColor = useColorModeValue("gray.800", "white");
+  const successColor = useColorModeValue("green.600", "green.400");
+  const dangerColor = useColorModeValue("red.600", "red.400");
 
   // Load route data
   useEffect(() => {
@@ -218,14 +224,24 @@ const RouteDetails = () => {
                 </HStack>
               </VStack>
 
-              <Button
-                leftIcon={<Icon as={FaTrash} />}
-                colorScheme="red"
-                variant="outline"
-                onClick={onOpen}
-              >
-                Delete
-              </Button>
+              <HStack spacing={3}>
+                <Button
+                  leftIcon={<Icon as={FaRunning} />}
+                  colorScheme="teal"
+                  onClick={() => navigate(`/run/${route._id}`)}
+                  size="lg"
+                >
+                  Run Route
+                </Button>
+                <Button
+                  leftIcon={<Icon as={FaTrash} />}
+                  colorScheme="red"
+                  variant="outline"
+                  onClick={onOpen}
+                >
+                  Delete
+                </Button>
+              </HStack>
             </Flex>
           </Box>
 
@@ -316,18 +332,12 @@ const RouteDetails = () => {
             borderColor={borderColor}
           >
             <VStack spacing={3} align="start">
-              <Heading
-                size="sm"
-                color={useColorModeValue("teal.600", "teal.300")}
-              >
+              <Heading size="sm" color={tealColor}>
                 Route Information
               </Heading>
               <Stack spacing={2} w="full">
                 <HStack justify="space-between">
-                  <Text
-                    fontWeight="medium"
-                    color={useColorModeValue("gray.700", "gray.200")}
-                  >
+                  <Text fontWeight="medium" color={labelColor}>
                     Created:
                   </Text>
                   <Text color={textColor}>
@@ -337,10 +347,7 @@ const RouteDetails = () => {
                   </Text>
                 </HStack>
                 <HStack justify="space-between">
-                  <Text
-                    fontWeight="medium"
-                    color={useColorModeValue("gray.700", "gray.200")}
-                  >
+                  <Text fontWeight="medium" color={labelColor}>
                     Route ID:
                   </Text>
                   <Text color={textColor} fontSize="sm" fontFamily="mono">
@@ -362,10 +369,7 @@ const RouteDetails = () => {
               boxShadow="xl"
             >
               <VStack spacing={4} align="stretch">
-                <Heading
-                  size="md"
-                  color={useColorModeValue("gray.800", "white")}
-                >
+                <Heading size="md" color={headingColor}>
                   Elevation Profile
                 </Heading>
                 <Divider />
@@ -377,11 +381,7 @@ const RouteDetails = () => {
                     <Text fontSize="sm" color={textColor}>
                       Min Elevation
                     </Text>
-                    <Text
-                      fontSize="xl"
-                      fontWeight="bold"
-                      color={useColorModeValue("gray.800", "white")}
-                    >
+                    <Text fontSize="xl" fontWeight="bold" color={headingColor}>
                       {route.elevationData.minElevation}m
                     </Text>
                   </Box>
@@ -389,11 +389,7 @@ const RouteDetails = () => {
                     <Text fontSize="sm" color={textColor}>
                       Max Elevation
                     </Text>
-                    <Text
-                      fontSize="xl"
-                      fontWeight="bold"
-                      color={useColorModeValue("gray.800", "white")}
-                    >
+                    <Text fontSize="xl" fontWeight="bold" color={headingColor}>
                       {formatElevation(route.elevationData.maxElevation)}
                     </Text>
                   </Box>
@@ -401,11 +397,7 @@ const RouteDetails = () => {
                     <Text fontSize="sm" color={textColor}>
                       Total Gain
                     </Text>
-                    <Text
-                      fontSize="xl"
-                      fontWeight="bold"
-                      color={useColorModeValue("green.600", "green.400")}
-                    >
+                    <Text fontSize="xl" fontWeight="bold" color={successColor}>
                       +{formatElevation(route.elevationData.elevationGain)}
                     </Text>
                   </Box>
@@ -413,11 +405,7 @@ const RouteDetails = () => {
                     <Text fontSize="sm" color={textColor}>
                       Total Loss
                     </Text>
-                    <Text
-                      fontSize="xl"
-                      fontWeight="bold"
-                      color={useColorModeValue("red.600", "red.400")}
-                    >
+                    <Text fontSize="xl" fontWeight="bold" color={dangerColor}>
                       -{formatElevation(route.elevationData.elevationLoss)}
                     </Text>
                   </Box>

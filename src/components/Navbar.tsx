@@ -21,10 +21,9 @@ import { useAuth } from "../contexts/AuthContext";
 
 const UserSection = () => {
   const { user } = useAuth();
+  const textColor = useColorModeValue("gray.800", "white");
 
   if (!user) return null;
-
-  const textColor = useColorModeValue("gray.800", "white");
 
   return (
     <Flex align="center" gap={3}>
@@ -155,6 +154,7 @@ const Navbar = () => {
               { path: "/", label: "Home" },
               { path: "/create", label: "Create Route" },
               { path: "/my-routes", label: "My Routes" },
+              { path: "/runs", label: "My Runs" },
               { path: "/about", label: "About" },
             ].map(({ path, label }) => (
               <Box key={path} role="group">

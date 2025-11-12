@@ -15,7 +15,6 @@ import {
   Avatar,
   useToast,
   Icon,
-  Select,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -27,8 +26,6 @@ import {
   FaMap,
   FaEye,
   FaGlobe,
-  FaSearchPlus,
-  FaSave,
   FaThLarge,
   FaTh,
   FaImage,

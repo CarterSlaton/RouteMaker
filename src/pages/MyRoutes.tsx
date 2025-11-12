@@ -62,6 +62,8 @@ const MyRoutes = () => {
   );
   const pageBg = useColorModeValue("gray.50", "gray.900");
   const statBoxBg = useColorModeValue("gray.50", "gray.700");
+  const headingColor = useColorModeValue("gray.800", "white");
+  const textColor = useColorModeValue("gray.500", "gray.400");
 
   // Get user preferences
   const isCompactView = user?.compactView ?? false;
@@ -220,7 +222,7 @@ const MyRoutes = () => {
                 bg={cardBg}
                 border="1px"
                 borderColor={borderColor}
-                color={useColorModeValue("gray.800", "white")}
+                color={headingColor}
                 _hover={{
                   borderColor: "teal.300",
                 }}
@@ -318,18 +320,10 @@ const MyRoutes = () => {
               mb={6}
               opacity={0.6}
             />
-            <Heading
-              size="lg"
-              mb={4}
-              color={useColorModeValue("gray.800", "white")}
-            >
+            <Heading size="lg" mb={4} color={headingColor}>
               {routes.length === 0 ? "No routes yet" : "No routes found"}
             </Heading>
-            <Text
-              fontSize="lg"
-              color={useColorModeValue("gray.500", "gray.400")}
-              mb={8}
-            >
+            <Text fontSize="lg" color={textColor} mb={8}>
               {routes.length === 0
                 ? "Start your running journey by creating your first route!"
                 : "Try adjusting your search to find what you're looking for."}
@@ -397,15 +391,11 @@ const MyRoutes = () => {
                 {/* Route info */}
                 <Flex flex="1" align="center" justify="space-between" gap={4}>
                   <VStack align="start" spacing={1} flex="1">
-                    <Heading
-                      size="sm"
-                      noOfLines={1}
-                      color={useColorModeValue("gray.800", "white")}
-                    >
+                    <Heading size="sm" noOfLines={1} color={headingColor}>
                       {route.name}
                     </Heading>
                     <HStack
-                      color={useColorModeValue("gray.500", "gray.400")}
+                      color={textColor}
                       fontSize="xs"
                       spacing={3}
                       flexWrap="wrap"
@@ -543,7 +533,7 @@ const MyRoutes = () => {
                       <Heading
                         size="md"
                         noOfLines={1}
-                        color={useColorModeValue("gray.800", "white")}
+                        color={headingColor}
                         flex="1"
                         pr={2}
                       >
@@ -578,11 +568,7 @@ const MyRoutes = () => {
                         )}
                       </HStack>
                     </HStack>
-                    <HStack
-                      color={useColorModeValue("gray.500", "gray.400")}
-                      fontSize="sm"
-                      spacing={4}
-                    >
+                    <HStack color={textColor} fontSize="sm" spacing={4}>
                       <HStack>
                         <Icon as={FaMapMarkerAlt} />
                         <Text noOfLines={1}>{route.location}</Text>
@@ -596,9 +582,7 @@ const MyRoutes = () => {
 
                   <Box w="full" p={4} bg={statBoxBg} borderRadius="lg">
                     <HStack justify="space-between">
-                      <Text color={useColorModeValue("gray.500", "gray.400")}>
-                        Distance
-                      </Text>
+                      <Text color={textColor}>Distance</Text>
                       <Text
                         fontWeight="bold"
                         fontSize="lg"

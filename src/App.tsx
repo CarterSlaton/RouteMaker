@@ -21,6 +21,9 @@ const Home = lazy(() => import("./pages/Home"));
 const CreateRoute = lazy(() => import("./pages/CreateRoute"));
 const MyRoutes = lazy(() => import("./pages/MyRoutes"));
 const RouteDetails = lazy(() => import("./pages/RouteDetails"));
+const RunRoute = lazy(() => import("./pages/RunRoute"));
+const RunHistory = lazy(() => import("./pages/RunHistory"));
+const RunDetail = lazy(() => import("./pages/RunDetail"));
 const About = lazy(() => import("./pages/About"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Login = lazy(() => import("./pages/Login"));
@@ -78,7 +81,7 @@ const AppContent = () => {
   const appBg = useColorModeValue("gray.50", "gray.900");
 
   return (
-    <Router>
+    <Router future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
       <Box
         minH="100vh"
         w="100%"
@@ -88,61 +91,87 @@ const AppContent = () => {
       >
         <Navbar />
         <FontSizeWrapper>
-          <Box as="main" flex="1" w="100%" p={4} overflowY="auto">
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route
-                  path="/"
-                  element={
-                    <ProtectedRoute>
-                      <Home />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/create"
-                  element={
-                    <ProtectedRoute>
-                      <CreateRoute />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/my-routes"
-                  element={
-                    <ProtectedRoute>
-                      <MyRoutes />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/route/:id"
-                  element={
-                    <ProtectedRoute>
-                      <RouteDetails />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/about"
-                  element={
-                    <ProtectedRoute>
-                      <About />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/settings"
-                  element={
-                    <ProtectedRoute>
-                      <Settings />
-                    </ProtectedRoute>
-                  }
-                />
-              </Routes>
-            </Suspense>
+          <Box as="main" flex="1" w="100%" overflowY="auto" bg={appBg}>
+            <Box p={4}>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route
+                    path="/"
+                    element={
+                      <ProtectedRoute>
+                        <Home />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/create"
+                    element={
+                      <ProtectedRoute>
+                        <CreateRoute />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/my-routes"
+                    element={
+                      <ProtectedRoute>
+                        <MyRoutes />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/route/:id"
+                    element={
+                      <ProtectedRoute>
+                        <RouteDetails />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/run/:routeId"
+                    element={
+                      <ProtectedRoute>
+                        <RunRoute />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/runs"
+                    element={
+                      <ProtectedRoute>
+                        <RunHistory />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/run-detail/:runId"
+                    element={
+                      <ProtectedRoute>
+                        <RunDetail />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/about"
+                    element={
+                      <ProtectedRoute>
+                        <About />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/settings"
+                    element={
+                      <ProtectedRoute>
+                        <Settings />
+                      </ProtectedRoute>
+                    }
+                  />
+                </Routes>
+              </Suspense>
+            </Box>
           </Box>
         </FontSizeWrapper>
       </Box>
