@@ -87,7 +87,6 @@ const RunHistory = () => {
   const headingColor = useColorModeValue("gray.800", "white");
   const subTextColor = useColorModeValue("gray.500", "gray.400");
   const statLabelColor = useColorModeValue("gray.600", "gray.400");
-  const statNumberColor = useColorModeValue("gray.900", "white");
 
   // Get user preferences
   const reduceAnimations = user?.reduceAnimations ?? false;
