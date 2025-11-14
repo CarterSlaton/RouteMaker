@@ -192,8 +192,9 @@ const RunRoute = () => {
           "line-cap": "round",
         },
         paint: {
-          "line-color": "#3182CE",
-          "line-width": 5,
+          "line-color": "#E53E3E", // Red color for tracking line
+          "line-width": 6,
+          "line-opacity": 0.9,
         },
       });
 
@@ -249,35 +250,61 @@ const RunRoute = () => {
     // Update user marker on map
     if (map.current) {
       if (!userMarker.current) {
-        // Create custom marker element
+        console.log('Creating user marker at:', position.longitude, position.latitude);
+        
+        // Create custom marker element with pulsing animation
         const el = document.createElement("div");
         el.className = "user-location-marker";
-        el.style.width = "40px";
-        el.style.height = "40px";
+        el.style.width = "50px";
+        el.style.height = "50px";
         el.style.borderRadius = "50%";
-        el.style.backgroundColor = "#3182CE";
-        el.style.border = "4px solid white";
-        el.style.boxShadow = "0 0 10px rgba(0,0,0,0.3)";
+        el.style.backgroundColor = "#E53E3E"; // Red to match tracking line
+        el.style.border = "5px solid white";
+        el.style.boxShadow = "0 0 20px rgba(229, 62, 62, 0.6), 0 0 0 0 rgba(229, 62, 62, 0.4)";
         el.style.display = "flex";
         el.style.alignItems = "center";
         el.style.justifyContent = "center";
-        el.style.fontSize = "20px";
+        el.style.fontSize = "24px";
+        el.style.zIndex = "1000";
+        el.style.animation = "pulse 2s infinite";
         el.innerHTML = "🏃";
+        
+        // Add CSS animation for pulse effect
+        const style = document.createElement("style");
+        style.textContent = `
+          @keyframes pulse {
+            0% {
+              box-shadow: 0 0 20px rgba(229, 62, 62, 0.6), 0 0 0 0 rgba(229, 62, 62, 0.4);
+            }
+            50% {
+              box-shadow: 0 0 30px rgba(229, 62, 62, 0.8), 0 0 0 15px rgba(229, 62, 62, 0);
+            }
+            100% {
+              box-shadow: 0 0 20px rgba(229, 62, 62, 0.6), 0 0 0 0 rgba(229, 62, 62, 0);
+            }
+          }
+        `;
+        document.head.appendChild(style);
 
         userMarker.current = new mapboxgl.Marker({
           element: el,
+          anchor: 'center',
         })
           .setLngLat([position.longitude, position.latitude])
           .addTo(map.current);
+          
+        console.log('User marker created and added to map');
       } else {
+        console.log('Updating marker position to:', position.longitude, position.latitude);
         userMarker.current.setLngLat([position.longitude, position.latitude]);
       }
 
-      // Update user path line
+      // Update user path line (red tracking line)
       const source = map.current.getSource(
         "user-path"
       ) as mapboxgl.GeoJSONSource;
       if (source) {
+        console.log('Updating red tracking line with', newPath.length, 'points');
         source.setData({
           type: "Feature",
           properties: {},
@@ -286,6 +313,8 @@ const RunRoute = () => {
             coordinates: newPath,
           },
         });
+      } else {
+        console.warn('User path source not found on map');
       }
 
       // Center map on user if follow mode is enabled
