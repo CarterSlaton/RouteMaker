@@ -232,7 +232,7 @@ const RunRoute = () => {
       isPaused,
       hasMap: !!map.current,
     });
-    
+
     setGpsError(null);
 
     // Don't skip if we don't have calculator yet (shouldn't happen, but just in case)
@@ -323,21 +323,37 @@ const RunRoute = () => {
         "user-path"
       ) as mapboxgl.GeoJSONSource;
       if (source) {
-        console.log(
-          "Updating red tracking line with",
-          newPath.length,
-          "points"
-        );
-        source.setData({
-          type: "Feature",
+        const lineData = {
+          type: "Feature" as const,
           properties: {},
           geometry: {
-            type: "LineString",
+            type: "LineString" as const,
             coordinates: newPath,
           },
+        };
+        
+        console.log("🔴 Updating red tracking line:", {
+          pointCount: newPath.length,
+          firstPoint: newPath[0],
+          lastPoint: newPath[newPath.length - 1],
         });
+        
+        source.setData(lineData);
+        
+        // Ensure the layer is visible
+        const layer = map.current.getLayer("user-path-line");
+        if (layer) {
+          const visibility = map.current.getLayoutProperty("user-path-line", "visibility");
+          console.log("Red line layer visibility:", visibility);
+          if (visibility === "none") {
+            map.current.setLayoutProperty("user-path-line", "visibility", "visible");
+            console.log("✅ Made red line visible");
+          }
+        } else {
+          console.warn("⚠️ user-path-line layer not found on map");
+        }
       } else {
-        console.warn("User path source not found on map");
+        console.warn("⚠️ User path source not found on map");
       }
 
       // Center map on user if follow mode is enabled
@@ -419,7 +435,7 @@ const RunRoute = () => {
       setIsPaused(false);
 
       // Create initial marker and path with starting position
-      console.log('Creating initial marker with position:', initialPosition);
+      console.log("Creating initial marker with position:", initialPosition);
       handlePositionUpdate(initialPosition);
 
       // Start GPS tracking
@@ -432,7 +448,7 @@ const RunRoute = () => {
         throw new Error("Failed to start GPS tracking");
       }
 
-      console.log('GPS tracking started successfully');
+      console.log("GPS tracking started successfully");
 
       // Start statistics update interval
       updateInterval.current = window.setInterval(() => {
@@ -578,7 +594,17 @@ const RunRoute = () => {
         updateInterval.current = null;
       }
 
-      // Complete run on backend
+      // Get final statistics and all GPS points
+      const stats = statsCalculator.current?.getStatistics();
+      const positions = statsCalculator.current?.getPositions() || [];
+      
+      console.log("Final run data:", {
+        totalPositions: positions.length,
+        totalDistance: stats?.totalDistance,
+        totalTime: stats?.totalTime,
+      });
+
+      // Complete run on backend with all data
       const token = localStorage.getItem("token");
       console.log(
         "Sending complete request to:",
@@ -593,6 +619,20 @@ const RunRoute = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          body: JSON.stringify({
+            gpsPoints: positions.map((p) => ({
+              latitude: p.latitude,
+              longitude: p.longitude,
+              timestamp: new Date(p.timestamp),
+              accuracy: p.accuracy,
+            })),
+            statistics: stats ? {
+              totalDistance: stats.totalDistance,
+              totalTime: stats.totalTime,
+              averagePace: stats.averagePace,
+              currentPace: stats.currentPace,
+            } : undefined,
+          }),
         }
       );
 

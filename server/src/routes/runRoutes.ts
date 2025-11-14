@@ -206,7 +206,7 @@ router.post("/:id/resume", authenticateToken, async (req: AuthRequest, res: Resp
 router.put("/:id/complete", authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { notes, weather } = req.body;
+    const { notes, weather, gpsPoints, statistics } = req.body;
     const userId = req.user?.id;
 
     if (!userId) {
@@ -223,6 +223,21 @@ router.put("/:id/complete", authenticateToken, async (req: AuthRequest, res: Res
       return res.status(400).json({ error: "Run already completed" });
     }
 
+    // Add final GPS points if provided
+    if (gpsPoints && Array.isArray(gpsPoints) && gpsPoints.length > 0) {
+      console.log(`Saving ${gpsPoints.length} GPS points for run ${id}`);
+      run.gpsPoints = gpsPoints; // Replace with all points from frontend
+    }
+
+    // Update statistics with final values if provided
+    if (statistics) {
+      console.log("Saving final statistics:", statistics);
+      run.statistics = {
+        ...run.statistics,
+        ...statistics,
+      };
+    }
+
     // If run was paused, calculate final pause duration
     if (run.status === "paused") {
       const lastPause = run.pauseTimestamps[run.pauseTimestamps.length - 1];
@@ -236,13 +251,15 @@ router.put("/:id/complete", authenticateToken, async (req: AuthRequest, res: Res
     run.status = "completed";
     run.endTime = new Date();
     
-    // Calculate final statistics
-    const totalTimeWithPauses = (run.endTime.getTime() - run.startTime.getTime()) / 1000;
-    run.statistics.totalTime = Math.max(0, totalTimeWithPauses - run.pausedDuration);
-    
-    if (run.statistics.totalDistance > 0 && run.statistics.totalTime > 0) {
-      // Average pace in minutes per km
-      run.statistics.averagePace = (run.statistics.totalTime / 60) / run.statistics.totalDistance;
+    // Only recalculate time if statistics weren't provided
+    if (!statistics) {
+      const totalTimeWithPauses = (run.endTime.getTime() - run.startTime.getTime()) / 1000;
+      run.statistics.totalTime = Math.max(0, totalTimeWithPauses - run.pausedDuration);
+      
+      if (run.statistics.totalDistance > 0 && run.statistics.totalTime > 0) {
+        // Average pace in minutes per km
+        run.statistics.averagePace = (run.statistics.totalTime / 60) / run.statistics.totalDistance;
+      }
     }
 
     if (notes) run.notes = notes;
