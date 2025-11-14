@@ -224,9 +224,17 @@ const RunRoute = () => {
 
   // Handle GPS position updates
   const handlePositionUpdate = (position: GPSPosition) => {
+    console.log('Position update received:', position);
     setGpsError(null);
 
-    if (!statsCalculator.current || !isRunning || isPaused) return;
+    if (!statsCalculator.current || !isRunning || isPaused) {
+      console.log('Skipping position update:', { 
+        hasCalculator: !!statsCalculator.current, 
+        isRunning, 
+        isPaused 
+      });
+      return;
+    }
 
     // Add position to statistics calculator
     statsCalculator.current.addPosition(position);

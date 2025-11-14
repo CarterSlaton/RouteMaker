@@ -26,7 +26,12 @@ const UserSection = () => {
   if (!user) return null;
 
   return (
-    <Flex align="center" gap={{ base: 2, md: 3 }} w={{ base: "100%", md: "auto" }} justify={{ base: "space-between", md: "flex-start" }}>
+    <Flex
+      align="center"
+      gap={{ base: 2, md: 3 }}
+      w={{ base: "100%", md: "auto" }}
+      justify={{ base: "space-between", md: "flex-start" }}
+    >
       <Flex align="center" gap={2}>
         <Avatar size="sm" name={user.name} bg="teal.500" />
         <Text
@@ -163,7 +168,12 @@ const Navbar = () => {
               { path: "/about", label: "About" },
             ].map(({ path, label }) => (
               <Box key={path} role="group">
-                <ChakraLink as={RouterLink} to={path} sx={navLinkStyles(path)} onClick={() => isOpen && onToggle()}>
+                <ChakraLink
+                  as={RouterLink}
+                  to={path}
+                  sx={navLinkStyles(path)}
+                  onClick={() => isOpen && onToggle()}
+                >
                   {label}
                 </ChakraLink>
               </Box>

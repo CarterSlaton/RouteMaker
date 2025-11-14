@@ -47,8 +47,18 @@ class GPSTrackingService {
       maximumAge: 0, // No cached positions
     };
 
+    console.log('Starting GPS watchPosition with high accuracy');
+    
     this.watchId = navigator.geolocation.watchPosition(
       (position) => {
+        console.log('watchPosition update:', {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+          speed: position.coords.speed,
+          heading: position.coords.heading
+        });
+        
         const gpsPosition: GPSPosition = {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
@@ -132,6 +142,12 @@ export class RunStatisticsCalculator {
 
   // Add a new GPS position
   addPosition(position: GPSPosition): void {
+    console.log('GPS Position added:', {
+      lat: position.latitude,
+      lng: position.longitude,
+      accuracy: position.accuracy,
+      totalPositions: this.positions.length + 1
+    });
     this.positions.push(position);
   }
 
@@ -146,14 +162,25 @@ export class RunStatisticsCalculator {
       const prev = this.positions[i - 1];
       const curr = this.positions[i];
       
-      // Only add distance if accuracy is reasonable (< 50 meters)
-      if (curr.accuracy < 50 && prev.accuracy < 50) {
-        totalDistance += calculateDistance(
+      // Only add distance if accuracy is reasonable (< 100 meters)
+      // Relaxed from 50m to 100m for better mobile GPS support
+      if (curr.accuracy < 100 && prev.accuracy < 100) {
+        const segmentDistance = calculateDistance(
           prev.latitude,
           prev.longitude,
           curr.latitude,
           curr.longitude
         );
+        
+        // Only add if the segment is reasonable (< 100 meters between updates)
+        // This filters out GPS jumps/glitches
+        if (segmentDistance < 0.1) { // 100 meters = 0.1 km
+          totalDistance += segmentDistance;
+        } else {
+          console.warn('GPS jump detected, ignoring segment:', segmentDistance, 'km');
+        }
+      } else {
+        console.warn('Poor GPS accuracy, ignoring position:', curr.accuracy, 'm');
       }
     }
 
@@ -174,14 +201,19 @@ export class RunStatisticsCalculator {
       const prev = recentPositions[i - 1];
       const curr = recentPositions[i];
       
-      if (curr.accuracy < 50 && prev.accuracy < 50) {
-        distance += calculateDistance(
+      if (curr.accuracy < 100 && prev.accuracy < 100) {
+        const segmentDistance = calculateDistance(
           prev.latitude,
           prev.longitude,
           curr.latitude,
           curr.longitude
         );
-        time += (curr.timestamp - prev.timestamp) / 1000; // Convert to seconds
+        
+        // Filter out GPS jumps
+        if (segmentDistance < 0.1) {
+          distance += segmentDistance;
+          time += (curr.timestamp - prev.timestamp) / 1000; // Convert to seconds
+        }
       }
     }
 

@@ -631,16 +631,39 @@ const CreateRoute = () => {
       >
         <Container maxW="container.xl" px={{ base: 4, md: 8 }}>
           <VStack spacing={4} align="stretch">
-            <Flex justify="space-between" align="center" direction={{ base: "column", md: "row" }} gap={4}>
-              <VStack align={{ base: "center", md: "start" }} spacing={1} flex="1" w={{ base: "100%", md: "auto" }}>
-                <Heading size={{ base: "lg", md: "xl" }} bgGradient={gradientBg} bgClip="text">
+            <Flex
+              justify="space-between"
+              align="center"
+              direction={{ base: "column", md: "row" }}
+              gap={4}
+            >
+              <VStack
+                align={{ base: "center", md: "start" }}
+                spacing={1}
+                flex="1"
+                w={{ base: "100%", md: "auto" }}
+              >
+                <Heading
+                  size={{ base: "lg", md: "xl" }}
+                  bgGradient={gradientBg}
+                  bgClip="text"
+                >
                   Create New Route
                 </Heading>
-                <Text color={useColorModeValue("gray.500", "gray.400")} fontSize={{ base: "sm", md: "md" }} textAlign={{ base: "center", md: "left" }}>
+                <Text
+                  color={useColorModeValue("gray.500", "gray.400")}
+                  fontSize={{ base: "sm", md: "md" }}
+                  textAlign={{ base: "center", md: "left" }}
+                >
                   Draw your route on the map or auto-generate a loop
                 </Text>
               </VStack>
-              <Flex gap={2} wrap="wrap" justify={{ base: "center", md: "flex-end" }} w={{ base: "100%", md: "auto" }}>
+              <Flex
+                gap={2}
+                wrap="wrap"
+                justify={{ base: "center", md: "flex-end" }}
+                w={{ base: "100%", md: "auto" }}
+              >
                 <Button
                   leftIcon={<Icon as={FaRoute} />}
                   colorScheme="purple"
@@ -697,7 +720,11 @@ const CreateRoute = () => {
           boxShadow="xl"
           mb={6}
         >
-          <Box ref={mapContainer} h={{ base: "400px", md: "500px", lg: "600px" }} w="100%" />
+          <Box
+            ref={mapContainer}
+            h={{ base: "400px", md: "500px", lg: "600px" }}
+            w="100%"
+          />
         </Box>
 
         <Flex justify="space-between" align="center" wrap="wrap" gap={4}>

@@ -183,19 +183,41 @@ const MyRoutes = () => {
       >
         <Container maxW="container.xl" px={{ base: 4, md: 8 }}>
           <VStack spacing={6} align="stretch">
-            <Flex justify="space-between" align="center" direction={{ base: "column", md: "row" }} gap={4}>
-              <VStack align={{ base: "center", md: "start" }} spacing={1} w={{ base: "100%", md: "auto" }}>
-                <Heading size={{ base: "lg", md: "xl" }} bgGradient={gradientBg} bgClip="text">
+            <Flex
+              justify="space-between"
+              align="center"
+              direction={{ base: "column", md: "row" }}
+              gap={4}
+            >
+              <VStack
+                align={{ base: "center", md: "start" }}
+                spacing={1}
+                w={{ base: "100%", md: "auto" }}
+              >
+                <Heading
+                  size={{ base: "lg", md: "xl" }}
+                  bgGradient={gradientBg}
+                  bgClip="text"
+                >
                   My Routes
                 </Heading>
-                <Text color="gray.500" fontSize={{ base: "sm", md: "md" }} textAlign={{ base: "center", md: "left" }}>
+                <Text
+                  color="gray.500"
+                  fontSize={{ base: "sm", md: "md" }}
+                  textAlign={{ base: "center", md: "left" }}
+                >
                   Track and manage your running adventures
                 </Text>
               </VStack>
               <Tooltip label="Create a new running route" hasArrow>
                 <Button
                   leftIcon={<Icon as={FaRoute} />}
-                  rightIcon={<Icon as={FaChevronRight} display={{ base: "none", sm: "inline" }} />}
+                  rightIcon={
+                    <Icon
+                      as={FaChevronRight}
+                      display={{ base: "none", sm: "inline" }}
+                    />
+                  }
                   colorScheme="teal"
                   onClick={() => navigate("/create")}
                   size={{ base: "md", md: "lg" }}
