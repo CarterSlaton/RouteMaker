@@ -331,22 +331,29 @@ const RunRoute = () => {
             coordinates: newPath,
           },
         };
-        
+
         console.log("🔴 Updating red tracking line:", {
           pointCount: newPath.length,
           firstPoint: newPath[0],
           lastPoint: newPath[newPath.length - 1],
         });
-        
+
         source.setData(lineData);
-        
+
         // Ensure the layer is visible
         const layer = map.current.getLayer("user-path-line");
         if (layer) {
-          const visibility = map.current.getLayoutProperty("user-path-line", "visibility");
+          const visibility = map.current.getLayoutProperty(
+            "user-path-line",
+            "visibility"
+          );
           console.log("Red line layer visibility:", visibility);
           if (visibility === "none") {
-            map.current.setLayoutProperty("user-path-line", "visibility", "visible");
+            map.current.setLayoutProperty(
+              "user-path-line",
+              "visibility",
+              "visible"
+            );
             console.log("✅ Made red line visible");
           }
         } else {
@@ -597,7 +604,7 @@ const RunRoute = () => {
       // Get final statistics and all GPS points
       const stats = statsCalculator.current?.getStatistics();
       const positions = statsCalculator.current?.getPositions() || [];
-      
+
       console.log("Final run data:", {
         totalPositions: positions.length,
         totalDistance: stats?.totalDistance,
@@ -626,12 +633,14 @@ const RunRoute = () => {
               timestamp: new Date(p.timestamp),
               accuracy: p.accuracy,
             })),
-            statistics: stats ? {
-              totalDistance: stats.totalDistance,
-              totalTime: stats.totalTime,
-              averagePace: stats.averagePace,
-              currentPace: stats.currentPace,
-            } : undefined,
+            statistics: stats
+              ? {
+                  totalDistance: stats.totalDistance,
+                  totalTime: stats.totalTime,
+                  averagePace: stats.averagePace,
+                  currentPace: stats.currentPace,
+                }
+              : undefined,
           }),
         }
       );
