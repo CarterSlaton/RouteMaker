@@ -226,14 +226,24 @@ const RunRoute = () => {
   // Handle GPS position updates
   const handlePositionUpdate = (position: GPSPosition) => {
     console.log("Position update received:", position);
+    console.log("Current state:", {
+      hasCalculator: !!statsCalculator.current,
+      isRunning,
+      isPaused,
+      hasMap: !!map.current,
+    });
+    
     setGpsError(null);
 
-    if (!statsCalculator.current || !isRunning || isPaused) {
-      console.log("Skipping position update:", {
-        hasCalculator: !!statsCalculator.current,
-        isRunning,
-        isPaused,
-      });
+    // Don't skip if we don't have calculator yet (shouldn't happen, but just in case)
+    if (!statsCalculator.current) {
+      console.warn("No stats calculator available");
+      return;
+    }
+
+    // Skip updates only if explicitly paused, not if just not running yet
+    if (isPaused) {
+      console.log("Skipping position update - run is paused");
       return;
     }
 
@@ -250,8 +260,12 @@ const RunRoute = () => {
     // Update user marker on map
     if (map.current) {
       if (!userMarker.current) {
-        console.log('Creating user marker at:', position.longitude, position.latitude);
-        
+        console.log(
+          "Creating user marker at:",
+          position.longitude,
+          position.latitude
+        );
+
         // Create custom marker element with pulsing animation
         const el = document.createElement("div");
         el.className = "user-location-marker";
@@ -260,7 +274,8 @@ const RunRoute = () => {
         el.style.borderRadius = "50%";
         el.style.backgroundColor = "#E53E3E"; // Red to match tracking line
         el.style.border = "5px solid white";
-        el.style.boxShadow = "0 0 20px rgba(229, 62, 62, 0.6), 0 0 0 0 rgba(229, 62, 62, 0.4)";
+        el.style.boxShadow =
+          "0 0 20px rgba(229, 62, 62, 0.6), 0 0 0 0 rgba(229, 62, 62, 0.4)";
         el.style.display = "flex";
         el.style.alignItems = "center";
         el.style.justifyContent = "center";
@@ -268,7 +283,7 @@ const RunRoute = () => {
         el.style.zIndex = "1000";
         el.style.animation = "pulse 2s infinite";
         el.innerHTML = "🏃";
-        
+
         // Add CSS animation for pulse effect
         const style = document.createElement("style");
         style.textContent = `
@@ -288,14 +303,18 @@ const RunRoute = () => {
 
         userMarker.current = new mapboxgl.Marker({
           element: el,
-          anchor: 'center',
+          anchor: "center",
         })
           .setLngLat([position.longitude, position.latitude])
           .addTo(map.current);
-          
-        console.log('User marker created and added to map');
+
+        console.log("User marker created and added to map");
       } else {
-        console.log('Updating marker position to:', position.longitude, position.latitude);
+        console.log(
+          "Updating marker position to:",
+          position.longitude,
+          position.latitude
+        );
         userMarker.current.setLngLat([position.longitude, position.latitude]);
       }
 
@@ -304,7 +323,11 @@ const RunRoute = () => {
         "user-path"
       ) as mapboxgl.GeoJSONSource;
       if (source) {
-        console.log('Updating red tracking line with', newPath.length, 'points');
+        console.log(
+          "Updating red tracking line with",
+          newPath.length,
+          "points"
+        );
         source.setData({
           type: "Feature",
           properties: {},
@@ -314,7 +337,7 @@ const RunRoute = () => {
           },
         });
       } else {
-        console.warn('User path source not found on map');
+        console.warn("User path source not found on map");
       }
 
       // Center map on user if follow mode is enabled
@@ -390,6 +413,15 @@ const RunRoute = () => {
       statsCalculator.current = new RunStatisticsCalculator(Date.now());
       statsCalculator.current.addPosition(initialPosition);
 
+      // Set initial state BEFORE starting tracking
+      setIsRunning(true);
+      setHasStarted(true);
+      setIsPaused(false);
+
+      // Create initial marker and path with starting position
+      console.log('Creating initial marker with position:', initialPosition);
+      handlePositionUpdate(initialPosition);
+
       // Start GPS tracking
       const started = gpsTracker.startTracking(
         handlePositionUpdate,
@@ -400,9 +432,7 @@ const RunRoute = () => {
         throw new Error("Failed to start GPS tracking");
       }
 
-      setIsRunning(true);
-      setHasStarted(true);
-      setIsPaused(false);
+      console.log('GPS tracking started successfully');
 
       // Start statistics update interval
       updateInterval.current = window.setInterval(() => {
