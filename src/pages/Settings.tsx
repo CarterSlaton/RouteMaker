@@ -85,8 +85,6 @@ const Settings = () => {
         duration: 3000,
         isClosable: true,
       });
-      // Refresh page to update all distances
-      window.location.reload();
     } catch (error) {
       toast({
         title: "Error updating preference",
