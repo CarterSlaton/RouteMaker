@@ -600,7 +600,7 @@ const RunRoute = () => {
         )}
 
         {/* Statistics Cards */}
-        <Flex spacing={4} justify="space-between" wrap="wrap" gap={4}>
+        <Flex justify="space-between" wrap="wrap" gap={4}>
           <Box
             bg={statBgColor}
             p={{ base: 3, md: 4 }}
@@ -611,11 +611,21 @@ const RunRoute = () => {
             minW={{ base: "calc(50% - 8px)", md: "auto" }}
           >
             <Stat>
-              <StatLabel color={labelColor} fontSize={{ base: "xs", md: "sm" }}>Distance</StatLabel>
-              <StatNumber fontSize={{ base: "lg", md: "2xl" }} color={numberColor}>
+              <StatLabel color={labelColor} fontSize={{ base: "xs", md: "sm" }}>
+                Distance
+              </StatLabel>
+              <StatNumber
+                fontSize={{ base: "lg", md: "2xl" }}
+                color={numberColor}
+              >
                 {formatDistance(statistics.distance)}
               </StatNumber>
-              <StatHelpText color={helpTextColor} fontSize={{ base: "xs", md: "sm" }}>Total</StatHelpText>
+              <StatHelpText
+                color={helpTextColor}
+                fontSize={{ base: "xs", md: "sm" }}
+              >
+                Total
+              </StatHelpText>
             </Stat>
           </Box>
 
@@ -629,11 +639,21 @@ const RunRoute = () => {
             minW={{ base: "calc(50% - 8px)", md: "auto" }}
           >
             <Stat>
-              <StatLabel color={labelColor} fontSize={{ base: "xs", md: "sm" }}>Time</StatLabel>
-              <StatNumber fontSize={{ base: "lg", md: "2xl" }} color={numberColor}>
+              <StatLabel color={labelColor} fontSize={{ base: "xs", md: "sm" }}>
+                Time
+              </StatLabel>
+              <StatNumber
+                fontSize={{ base: "lg", md: "2xl" }}
+                color={numberColor}
+              >
                 {formatTime(statistics.time)}
               </StatNumber>
-              <StatHelpText color={helpTextColor} fontSize={{ base: "xs", md: "sm" }}>Active</StatHelpText>
+              <StatHelpText
+                color={helpTextColor}
+                fontSize={{ base: "xs", md: "sm" }}
+              >
+                Active
+              </StatHelpText>
             </Stat>
           </Box>
 
@@ -647,11 +667,21 @@ const RunRoute = () => {
             minW={{ base: "calc(50% - 8px)", md: "auto" }}
           >
             <Stat>
-              <StatLabel color={labelColor} fontSize={{ base: "xs", md: "sm" }}>Current Pace</StatLabel>
-              <StatNumber fontSize={{ base: "lg", md: "2xl" }} color={numberColor}>
+              <StatLabel color={labelColor} fontSize={{ base: "xs", md: "sm" }}>
+                Current Pace
+              </StatLabel>
+              <StatNumber
+                fontSize={{ base: "lg", md: "2xl" }}
+                color={numberColor}
+              >
                 {formatPace(statistics.currentPace)}
               </StatNumber>
-              <StatHelpText color={helpTextColor} fontSize={{ base: "xs", md: "sm" }}>{paceUnit}</StatHelpText>
+              <StatHelpText
+                color={helpTextColor}
+                fontSize={{ base: "xs", md: "sm" }}
+              >
+                {paceUnit}
+              </StatHelpText>
             </Stat>
           </Box>
 
@@ -665,11 +695,21 @@ const RunRoute = () => {
             minW={{ base: "calc(50% - 8px)", md: "auto" }}
           >
             <Stat>
-              <StatLabel color={labelColor} fontSize={{ base: "xs", md: "sm" }}>Avg Pace</StatLabel>
-              <StatNumber fontSize={{ base: "lg", md: "2xl" }} color={numberColor}>
+              <StatLabel color={labelColor} fontSize={{ base: "xs", md: "sm" }}>
+                Avg Pace
+              </StatLabel>
+              <StatNumber
+                fontSize={{ base: "lg", md: "2xl" }}
+                color={numberColor}
+              >
                 {formatPace(statistics.averagePace)}
               </StatNumber>
-              <StatHelpText color={helpTextColor} fontSize={{ base: "xs", md: "sm" }}>{paceUnit}</StatHelpText>
+              <StatHelpText
+                color={helpTextColor}
+                fontSize={{ base: "xs", md: "sm" }}
+              >
+                {paceUnit}
+              </StatHelpText>
             </Stat>
           </Box>
         </Flex>
