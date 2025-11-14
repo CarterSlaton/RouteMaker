@@ -1,4 +1,5 @@
 // Route storage utility using MongoDB API
+import { API_BASE_URL } from "../config/api";
 
 export interface Route {
   id?: string;
@@ -24,7 +25,7 @@ export interface Route {
   createdAt?: string | number;
 }
 
-const API_URL = "http://localhost:5000/api/routes";
+const API_URL = `${API_BASE_URL}/api/routes`;
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {

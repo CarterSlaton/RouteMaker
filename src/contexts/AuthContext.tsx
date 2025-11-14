@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import type { ReactNode } from "react";
+import { API_BASE_URL } from "../config/api";
 
 interface User {
   id: string;
@@ -34,7 +35,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = `${API_BASE_URL}/api`;
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,

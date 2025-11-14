@@ -38,6 +38,7 @@ import {
 } from "../utils/gpsTracking";
 import { useDistanceUnit } from "../utils/useDistanceUnit";
 import { useAuth } from "../contexts/AuthContext";
+import { API_BASE_URL } from "../config/api";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
@@ -99,7 +100,7 @@ const RunRoute = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `http://localhost:5000/api/routes/${routeId}`,
+          `${API_BASE_URL}/api/routes/${routeId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -332,7 +333,7 @@ const RunRoute = () => {
 
       // Start run on backend
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/api/runs", {
+      const response = await fetch(`${API_BASE_URL}/api/runs`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -410,7 +411,7 @@ const RunRoute = () => {
       setIsRunning(false);
 
       const token = localStorage.getItem("token");
-      await fetch(`http://localhost:5000/api/runs/${runId}/pause`, {
+      await fetch(`${API_BASE_URL}/api/runs/${runId}/pause`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -438,7 +439,7 @@ const RunRoute = () => {
       setIsRunning(true);
 
       const token = localStorage.getItem("token");
-      await fetch(`http://localhost:5000/api/runs/${runId}/resume`, {
+      await fetch(`${API_BASE_URL}/api/runs/${runId}/resume`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -464,7 +465,7 @@ const RunRoute = () => {
       const stats = statsCalculator.current.getStatistics();
       const positions = statsCalculator.current.getPositions();
 
-      await fetch(`http://localhost:5000/api/runs/${runId}`, {
+      await fetch(`${API_BASE_URL}/api/runs/${runId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -517,11 +518,11 @@ const RunRoute = () => {
       const token = localStorage.getItem("token");
       console.log(
         "Sending complete request to:",
-        `http://localhost:5000/api/runs/${runId}/complete`
+        `${API_BASE_URL}/api/runs/${runId}/complete`
       );
 
       const response = await fetch(
-        `http://localhost:5000/api/runs/${runId}/complete`,
+        `${API_BASE_URL}/api/runs/${runId}/complete`,
         {
           method: "PUT",
           headers: {

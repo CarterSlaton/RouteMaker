@@ -35,6 +35,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useDistanceUnit } from "../utils/useDistanceUnit";
 import { useAuth } from "../contexts/AuthContext";
 import { formatTime, formatPace } from "../utils/gpsTracking";
+import { API_BASE_URL } from "../config/api";
 
 // Define animations
 const fadeIn = keyframes`
@@ -103,7 +104,7 @@ const RunHistory = () => {
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
-        let url = "http://localhost:5000/api/runs";
+        let url = `${API_BASE_URL}/api/runs`;
         if (statusFilter) {
           url += `?status=${statusFilter}`;
         }
