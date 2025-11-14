@@ -482,18 +482,6 @@ const RunHistory = () => {
                           {paceUnit}
                         </Text>
                       </Flex>
-
-                      {run.statistics?.calories && (
-                        <Flex justify="space-between" align="center">
-                          <HStack color={statLabelColor}>
-                            <Icon as={FaRunning} />
-                            <Text fontSize="sm">Calories</Text>
-                          </HStack>
-                          <Text fontWeight="bold" color="teal.500">
-                            {Math.round(run.statistics.calories)} kcal
-                          </Text>
-                        </Flex>
-                      )}
                     </VStack>
                   </Box>
                 </Box>

@@ -28,7 +28,6 @@ import {
   FaClock,
   FaTachometerAlt,
   FaRoute,
-  FaFire,
   FaMapMarkerAlt,
 } from "react-icons/fa";
 import { useDistanceUnit } from "../utils/useDistanceUnit";
@@ -105,7 +104,7 @@ const RunDetail = () => {
 
         const data = await response.json();
         console.log("Fetched run data:", data);
-        setRun(data);
+        setRun(data.run);
       } catch (error: any) {
         console.error("Error fetching run:", error);
         navigate("/runs");
@@ -298,7 +297,7 @@ const RunDetail = () => {
         </Box>
 
         {/* Statistics Grid */}
-        <SimpleGrid columns={{ base: 2, md: 4 }} spacing={4}>
+        <SimpleGrid columns={{ base: 2, md: 3 }} spacing={4}>
           <Box
             bg={cardBg}
             p={6}
@@ -353,27 +352,6 @@ const RunDetail = () => {
                 {formatPace(run.statistics?.averagePace || 0)}
               </StatNumber>
               <StatHelpText color={textColor}>{paceUnit}</StatHelpText>
-            </Stat>
-          </Box>
-
-          <Box
-            bg={cardBg}
-            p={6}
-            borderRadius="xl"
-            border="1px"
-            borderColor={borderColor}
-          >
-            <Stat>
-              <StatLabel color={labelColor}>
-                <Icon as={FaFire} mr={2} />
-                Calories
-              </StatLabel>
-              <StatNumber color="teal.500" fontSize="3xl">
-                {run.statistics?.calories
-                  ? Math.round(run.statistics.calories)
-                  : "--"}
-              </StatNumber>
-              <StatHelpText color={textColor}>kcal</StatHelpText>
             </Stat>
           </Box>
         </SimpleGrid>
