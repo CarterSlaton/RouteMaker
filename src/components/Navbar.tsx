@@ -26,13 +26,14 @@ const UserSection = () => {
   if (!user) return null;
 
   return (
-    <Flex align="center" gap={3}>
+    <Flex align="center" gap={{ base: 2, md: 3 }} w={{ base: "100%", md: "auto" }} justify={{ base: "space-between", md: "flex-start" }}>
       <Flex align="center" gap={2}>
         <Avatar size="sm" name={user.name} bg="teal.500" />
         <Text
-          display={{ base: "none", md: "block" }}
+          display={{ base: "none", sm: "block" }}
           fontWeight="medium"
           color={textColor}
+          fontSize={{ base: "sm", md: "md" }}
         >
           {user.name}
         </Text>
@@ -40,12 +41,13 @@ const UserSection = () => {
       <Button
         as={RouterLink}
         to="/settings"
-        leftIcon={<Icon as={FaCog} />}
+        leftIcon={<Icon as={FaCog} display={{ base: "none", sm: "inline" }} />}
         colorScheme="teal"
         variant="outline"
         size="sm"
       >
-        Settings
+        <Text display={{ base: "none", sm: "inline" }}>Settings</Text>
+        <Icon as={FaCog} display={{ base: "inline", sm: "none" }} />
       </Button>
     </Flex>
   );
@@ -141,14 +143,17 @@ const Navbar = () => {
           flexBasis={{ base: "100%", md: "auto" }}
           mt={{ base: 4, md: 0 }}
           alignItems="center"
-          gap={6}
+          gap={{ base: 4, md: 6 }}
+          flexDirection={{ base: "column", md: "row" }}
+          w={{ base: "100%", md: "auto" }}
         >
           <Stack
-            spacing={8}
+            spacing={{ base: 4, md: 8 }}
             align="center"
             justify={["center", "space-between", "flex-end"]}
             direction={["column", "row"]}
             pt={[4, 4, 0]}
+            w={{ base: "100%", md: "auto" }}
           >
             {[
               { path: "/", label: "Home" },
@@ -158,13 +163,15 @@ const Navbar = () => {
               { path: "/about", label: "About" },
             ].map(({ path, label }) => (
               <Box key={path} role="group">
-                <ChakraLink as={RouterLink} to={path} sx={navLinkStyles(path)}>
+                <ChakraLink as={RouterLink} to={path} sx={navLinkStyles(path)} onClick={() => isOpen && onToggle()}>
                   {label}
                 </ChakraLink>
               </Box>
             ))}
           </Stack>
-          <UserSection />
+          <Box w={{ base: "100%", md: "auto" }} pb={{ base: 4, md: 0 }}>
+            <UserSection />
+          </Box>
         </Flex>
       </Flex>
     </Box>

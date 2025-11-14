@@ -600,81 +600,85 @@ const RunRoute = () => {
         )}
 
         {/* Statistics Cards */}
-        <HStack spacing={4} justify="space-between">
+        <Flex spacing={4} justify="space-between" wrap="wrap" gap={4}>
           <Box
             bg={statBgColor}
-            p={4}
+            p={{ base: 3, md: 4 }}
             borderRadius="lg"
             borderWidth="1px"
             borderColor={borderColor}
-            flex={1}
+            flex={{ base: "1 1 calc(50% - 8px)", md: "1" }}
+            minW={{ base: "calc(50% - 8px)", md: "auto" }}
           >
             <Stat>
-              <StatLabel color={labelColor}>Distance</StatLabel>
-              <StatNumber fontSize="2xl" color={numberColor}>
+              <StatLabel color={labelColor} fontSize={{ base: "xs", md: "sm" }}>Distance</StatLabel>
+              <StatNumber fontSize={{ base: "lg", md: "2xl" }} color={numberColor}>
                 {formatDistance(statistics.distance)}
               </StatNumber>
-              <StatHelpText color={helpTextColor}>Total</StatHelpText>
+              <StatHelpText color={helpTextColor} fontSize={{ base: "xs", md: "sm" }}>Total</StatHelpText>
             </Stat>
           </Box>
 
           <Box
             bg={statBgColor}
-            p={4}
+            p={{ base: 3, md: 4 }}
             borderRadius="lg"
             borderWidth="1px"
             borderColor={borderColor}
-            flex={1}
+            flex={{ base: "1 1 calc(50% - 8px)", md: "1" }}
+            minW={{ base: "calc(50% - 8px)", md: "auto" }}
           >
             <Stat>
-              <StatLabel color={labelColor}>Time</StatLabel>
-              <StatNumber fontSize="2xl" color={numberColor}>
+              <StatLabel color={labelColor} fontSize={{ base: "xs", md: "sm" }}>Time</StatLabel>
+              <StatNumber fontSize={{ base: "lg", md: "2xl" }} color={numberColor}>
                 {formatTime(statistics.time)}
               </StatNumber>
-              <StatHelpText color={helpTextColor}>Active</StatHelpText>
+              <StatHelpText color={helpTextColor} fontSize={{ base: "xs", md: "sm" }}>Active</StatHelpText>
             </Stat>
           </Box>
 
           <Box
             bg={statBgColor}
-            p={4}
+            p={{ base: 3, md: 4 }}
             borderRadius="lg"
             borderWidth="1px"
             borderColor={borderColor}
-            flex={1}
+            flex={{ base: "1 1 calc(50% - 8px)", md: "1" }}
+            minW={{ base: "calc(50% - 8px)", md: "auto" }}
           >
             <Stat>
-              <StatLabel color={labelColor}>Current Pace</StatLabel>
-              <StatNumber fontSize="2xl" color={numberColor}>
+              <StatLabel color={labelColor} fontSize={{ base: "xs", md: "sm" }}>Current Pace</StatLabel>
+              <StatNumber fontSize={{ base: "lg", md: "2xl" }} color={numberColor}>
                 {formatPace(statistics.currentPace)}
               </StatNumber>
-              <StatHelpText color={helpTextColor}>{paceUnit}</StatHelpText>
+              <StatHelpText color={helpTextColor} fontSize={{ base: "xs", md: "sm" }}>{paceUnit}</StatHelpText>
             </Stat>
           </Box>
 
           <Box
             bg={statBgColor}
-            p={4}
+            p={{ base: 3, md: 4 }}
             borderRadius="lg"
             borderWidth="1px"
             borderColor={borderColor}
-            flex={1}
+            flex={{ base: "1 1 calc(50% - 8px)", md: "1" }}
+            minW={{ base: "calc(50% - 8px)", md: "auto" }}
           >
             <Stat>
-              <StatLabel color={labelColor}>Avg Pace</StatLabel>
-              <StatNumber fontSize="2xl" color={numberColor}>
+              <StatLabel color={labelColor} fontSize={{ base: "xs", md: "sm" }}>Avg Pace</StatLabel>
+              <StatNumber fontSize={{ base: "lg", md: "2xl" }} color={numberColor}>
                 {formatPace(statistics.averagePace)}
               </StatNumber>
-              <StatHelpText color={helpTextColor}>{paceUnit}</StatHelpText>
+              <StatHelpText color={helpTextColor} fontSize={{ base: "xs", md: "sm" }}>{paceUnit}</StatHelpText>
             </Stat>
           </Box>
-        </HStack>
+        </Flex>
 
         {/* Map */}
         <Box position="relative">
           <Box
             ref={mapContainer}
-            height="500px"
+            height={{ base: "400px", md: "500px" }}
             borderRadius="lg"
             overflow="hidden"
             borderWidth="1px"
