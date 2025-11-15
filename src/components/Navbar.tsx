@@ -162,7 +162,7 @@ const Navbar = () => {
           >
             {[
               { path: "/", label: "Home" },
-              { path: "/create", label: "Create Route" },
+              { path: "/create", label: "Generate Route" },
               { path: "/my-routes", label: "My Routes" },
               { path: "/runs", label: "My Runs" },
               { path: "/about", label: "About" },

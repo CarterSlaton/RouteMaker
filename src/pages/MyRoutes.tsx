@@ -222,13 +222,18 @@ const MyRoutes = () => {
                   onClick={() => navigate("/create")}
                   size={{ base: "md", md: "lg" }}
                   w={{ base: "100%", md: "auto" }}
+                  bgGradient="linear(to-r, teal.500, blue.500)"
                   _hover={{
                     transform: "translateY(-2px)",
                     shadow: "lg",
+                    bgGradient: "linear(to-r, teal.600, blue.600)",
+                  }}
+                  _active={{
+                    bgGradient: "linear(to-r, teal.600, blue.600)",
                   }}
                   transition="all 0.2s"
                 >
-                  Create New Route
+                  Generate Route
                 </Button>
               </Tooltip>
             </Flex>

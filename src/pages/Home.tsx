@@ -155,17 +155,22 @@ const Home = () => {
                     size="lg"
                     colorScheme="teal"
                     onClick={() => navigate("/create")}
-                    rightIcon={<Icon as={FaChevronRight} />}
+                    rightIcon={<Icon as={FaRoute} />}
                     px={8}
                     py={6}
                     fontSize="xl"
+                    bgGradient="linear(to-r, teal.500, blue.500)"
                     _hover={{
                       transform: "translateY(-4px)",
                       boxShadow: "xl",
+                      bgGradient: "linear(to-r, teal.600, blue.600)",
+                    }}
+                    _active={{
+                      bgGradient: "linear(to-r, teal.600, blue.600)",
                     }}
                     transition="all 0.3s"
                   >
-                    Start Creating Routes
+                    Generate a Route
                   </Button>
                   <Button
                     size="lg"
@@ -215,8 +220,8 @@ const Home = () => {
                   />
                   <StepCard
                     stepNumber="2"
-                    title="Design Your Route"
-                    description="Use our interactive map to plot your perfect running route. Click to add waypoints and see distance instantly."
+                    title="Generate Your Route"
+                    description="Enter your desired distance and let our smart algorithm create the perfect loop route from your location instantly."
                     icon={FaMapMarkedAlt}
                   />
                   <StepCard

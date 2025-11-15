@@ -630,82 +630,75 @@ const CreateRoute = () => {
         w="100%"
       >
         <Container maxW="container.xl" px={{ base: 4, md: 8 }}>
-          <VStack spacing={4} align="stretch">
-            <Flex
-              justify="space-between"
-              align="center"
-              direction={{ base: "column", md: "row" }}
-              gap={4}
+          <VStack spacing={6} align="center" py={4}>
+            <VStack spacing={2} align="center" textAlign="center">
+              <Heading
+                size={{ base: "xl", md: "2xl" }}
+                bgGradient={gradientBg}
+                bgClip="text"
+              >
+                Generate a Running Route
+              </Heading>
+              <Text
+                color={useColorModeValue("gray.600", "gray.400")}
+                fontSize={{ base: "md", md: "lg" }}
+                maxW="600px"
+              >
+                Automatically create a loop route from your location
+              </Text>
+            </VStack>
+
+            {/* Big prominent generate button */}
+            <Button
+              leftIcon={<Icon as={FaRoute} boxSize={6} />}
+              colorScheme="teal"
+              size="lg"
+              onClick={onGenerateOpen}
+              isLoading={isGenerating}
+              loadingText="Generating..."
+              fontSize="xl"
+              px={12}
+              py={8}
+              h="auto"
+              _hover={{
+                transform: reduceAnimations ? "none" : "scale(1.05)",
+                shadow: "2xl",
+              }}
+              transition={reduceAnimations ? "none" : "all 0.3s"}
+              bgGradient="linear(to-r, teal.500, blue.500)"
+              _active={{
+                bgGradient: "linear(to-r, teal.600, blue.600)",
+              }}
             >
-              <VStack
-                align={{ base: "center", md: "start" }}
-                spacing={1}
-                flex="1"
-                w={{ base: "100%", md: "auto" }}
-              >
-                <Heading
-                  size={{ base: "lg", md: "xl" }}
-                  bgGradient={gradientBg}
-                  bgClip="text"
-                >
-                  Create New Route
-                </Heading>
-                <Text
-                  color={useColorModeValue("gray.500", "gray.400")}
-                  fontSize={{ base: "sm", md: "md" }}
-                  textAlign={{ base: "center", md: "left" }}
-                >
-                  Draw your route on the map or auto-generate a loop
-                </Text>
-              </VStack>
-              <Flex
-                gap={2}
-                wrap="wrap"
-                justify={{ base: "center", md: "flex-end" }}
-                w={{ base: "100%", md: "auto" }}
-              >
-                <Button
-                  leftIcon={<Icon as={FaRoute} />}
-                  colorScheme="purple"
-                  variant="outline"
-                  onClick={onGenerateOpen}
-                  isLoading={isGenerating}
-                  loadingText="Generating..."
-                  size={{ base: "sm", md: "md" }}
-                  _hover={{
-                    transform: reduceAnimations ? "none" : "translateY(-2px)",
-                    shadow: "md",
-                  }}
-                  transition={reduceAnimations ? "none" : "all 0.2s"}
-                  flexShrink={0}
-                >
-                  Auto-Generate
-                </Button>
+              Generate Route
+            </Button>
+
+            {/* Current route stats - only show if a route exists */}
+            {distance > 0 && (
+              <Flex gap={4} wrap="wrap" justify="center">
                 <Badge
                   colorScheme="blue"
-                  p={2}
+                  p={3}
                   borderRadius="full"
                   display="flex"
                   alignItems="center"
                   gap={2}
-                  fontSize={{ base: "sm", md: "md" }}
-                  flexShrink={0}
+                  fontSize="md"
                 >
                   <Icon as={FaRoute} />
                   {formatDistance(distance)}
                 </Badge>
                 <Badge
                   colorScheme={getDifficultyColor(difficulty)}
-                  p={2}
+                  p={3}
                   borderRadius="full"
-                  fontSize={{ base: "sm", md: "md" }}
+                  fontSize="md"
                   textTransform="capitalize"
-                  flexShrink={0}
                 >
                   {difficulty}
                 </Badge>
               </Flex>
-            </Flex>
+            )}
           </VStack>
         </Container>
       </Box>
