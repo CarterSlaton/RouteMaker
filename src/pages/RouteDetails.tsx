@@ -382,7 +382,7 @@ const RouteDetails = () => {
                       Min Elevation
                     </Text>
                     <Text fontSize="xl" fontWeight="bold" color={headingColor}>
-                      {route.elevationData.minElevation}m
+                      {formatElevation(route.elevationData.minElevation)}
                     </Text>
                   </Box>
                   <Box textAlign="center">
